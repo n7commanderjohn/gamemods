@@ -8,20 +8,62 @@ Description: Cut the pesky grass with your wonderful machete! Save lots of time!
 
 ]]
 
-local function onhackedfn(inst, target, hacksleft, from_shears)
+local function onhackedfn_grass(inst, target, hacksleft, from_shears)
 
     local fx = GLOBAL.SpawnPrefab("hacking_tall_grass_fx")
     local x, y, z= inst.Transform:GetWorldPosition()
     fx.Transform:SetPosition(x,y + math.random()*2,z)
 
-    if inst:HasTag("weevole_infested")then
-        spawnweevole(inst, target)
-    end
-
     if inst.components.hackable and inst.components.hackable.hacksleft <= 0 then		
         inst.AnimState:PlayAnimation("fall")			
         inst.AnimState:PushAnimation("picked",true)			
-        inst.SoundEmitter:PlaySound("dontstarve_DLC002/common/vine_drop")	
+        if inst.SoundEmitter == nil then
+            inst.entity:AddSoundEmitter() --failsafe but probably unnecessary
+        end
+        inst.SoundEmitter:PlaySound("dontstarve/wilson/pickup_reeds")	
+
+    else
+        inst.AnimState:PlayAnimation("chop") 
+        inst.AnimState:PushAnimation("idle",true)
+    end
+
+    if inst.components.pickable then
+        inst.components.pickable:MakeEmpty()
+    end
+
+    if not from_shears then	
+        inst.SoundEmitter:PlaySound("dontstarve_DLC003/common/harvested/grass_tall/machete")
+    end
+    
+
+    --[[
+    if inst.components.pickable and inst.components.pickable:IsBarren() then
+        inst.AnimState:PushAnimation("idle_dead")
+    else
+        inst.AnimState:PushAnimation("picked")
+        if inst.inwater then 
+            inst.Physics:SetCollides(false)
+
+            inst.AnimState:SetLayer( LAYER_BACKGROUND )
+            inst.AnimState:SetSortOrder( 3 )
+        end 
+    end
+    ]]
+end
+
+local function onhackedfn_sapling(inst, target, hacksleft, from_shears)
+
+    local fx = GLOBAL.SpawnPrefab("hacking_tall_grass_fx")
+    local x, y, z= inst.Transform:GetWorldPosition()
+    fx.Transform:SetPosition(x,y + math.random()*2,z)
+
+    if inst.components.hackable and inst.components.hackable.hacksleft <= 0 then		
+        inst.AnimState:PlayAnimation("rustle") 
+        inst.AnimState:PushAnimation("picked", false) 
+        if inst.SoundEmitter == nil then
+            inst.entity:AddSoundEmitter() --this will add it for saplings
+        end
+        inst.SoundEmitter:PlaySound("dontstarve/wilson/harvest_sticks")	
         if inst:HasTag("weevole_infested")then	
             removeweevoleden(inst)
         end
@@ -102,7 +144,7 @@ local function makebarrenfn(inst)
     inst.components.hackable.hacksleft = 0
 end
 
-local function onpickedfn(inst)
+local function onpickedfn_grass(inst)
 	--inst.SoundEmitter:PlaySound("dontstarve/wilson/pickup_reeds") 
 	inst.AnimState:PlayAnimation("picking") 
 	
@@ -118,11 +160,21 @@ local function onpickedfn(inst)
 		end 
     end
 
-    -- this should prevent hacking after grass has been picked by hand
+    -- this should prevent hacking after grass and saplings have been picked by hand
     if inst.components.hackable then
 		inst.components.hackable:MakeEmpty()
 	end
 end
+
+local function onpickedfn_sapling(inst)
+	inst.AnimState:PlayAnimation("rustle") 
+    inst.AnimState:PushAnimation("picked", false) 
+    
+    if inst.components.hackable then
+		inst.components.hackable:MakeEmpty()
+	end
+end
+
 
 --special post-init function for a particular prefab: grass in this case
 --not sure yet if local functions have to be reimported to work properly;
@@ -131,12 +183,30 @@ function cutGrassWithMachete_PostInit(inst)
     print("i can cut grass with machetes!")
 
     -- need to override the existing grass picking to include making hacking impossible after picking
-    inst.components.pickable.onpickedfn = onpickedfn
+    inst.components.pickable.onpickedfn = onpickedfn_grass
 
     inst:AddComponent("hackable")
     inst.components.hackable:SetUp("cutgrass", TUNING.GRASS_REGROW_TIME )
     inst.components.hackable.onregenfn = onregenfn
-    inst.components.hackable.onhackedfn = onhackedfn
+    inst.components.hackable.onhackedfn = onhackedfn_grass
+    inst.components.hackable.makeemptyfn = makeemptyfn
+    inst.components.hackable.makebarrenfn = makebarrenfn
+    inst.components.hackable.max_cycles = 20
+    inst.components.hackable.cycles_left = 20
+    inst.components.hackable.hacksleft = 1
+    inst.components.hackable.maxhacks = 1
+end
+
+function cutSaplingWithMachete_PostInit(inst)
+    print("i can cut saplings with machetes!")
+
+    -- need to override the existing sappling picking to include making hacking impossible after picking
+    inst.components.pickable.onpickedfn = onpickedfn_sapling
+
+    inst:AddComponent("hackable")
+    inst.components.hackable:SetUp("twigs", TUNING.SAPLING_REGROW_TIME )
+    inst.components.hackable.onregenfn = onregenfn
+    inst.components.hackable.onhackedfn = onhackedfn_sapling
     inst.components.hackable.makeemptyfn = makeemptyfn
     inst.components.hackable.makebarrenfn = makebarrenfn
     inst.components.hackable.max_cycles = 20
@@ -147,3 +217,5 @@ end
 
 --add a post init for the grass
 AddPrefabPostInit("grass", cutGrassWithMachete_PostInit)
+--add a post init for the sapling
+AddPrefabPostInit("sapling", cutSaplingWithMachete_PostInit)

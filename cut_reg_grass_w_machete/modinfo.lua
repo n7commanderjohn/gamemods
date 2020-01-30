@@ -1,8 +1,8 @@
 -- This information tells other players more about the mod
-name = " Cut Regular Grass with the machete!"
+name = " Grass and Saplings Machete Cutting!"
 description = 
 [[
-Tired of taking forever picking your grass by hand? No worries, cut them down fast today with your trusty machete!
+Tired of taking forever picking your grass and saplings by hand? No worries, cut them down fast today with your trusty machete!
 Obviously doesn't work with worlds that don't have craftable machete. Not tested with vanilla or RoG only.
 Should work with Shipwrecked and Hamlet compatibility enabled.
 ]]
