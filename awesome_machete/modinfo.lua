@@ -1,11 +1,6 @@
 -- This information tells other players more about the mod
-name = " Cut Regular Grass with the machete!"
-description = 
-[[
-Tired of taking forever picking your grass by hand? No worries, cut them down fast today with your trusty machete!
-Obviously doesn't work with worlds that don't have craftable machete. Not tested with vanilla or RoG only.
-Should work with Shipwrecked and Hamlet compatibility enabled.
-]]
+name = "Awesome Machete! Grass/Sapling Hacking"
+description = "Tired of taking forever picking your grass and saplings by hand? No worries, cut them down fast today with your trusty machete! Works with both standard and Lavish machetes. Should work with Shipwrecked and Hamlet compatibility enabled."
 
 author = "N7 Commander John"
 version = "1.0"
@@ -22,7 +17,7 @@ api_version = 6
 dont_starve_compatible = false
 reign_of_giants_compatible = false
 shipwrecked_compatible = true
-porkland_compatible = true
+hamlet_compatible = true
 
 -- Can specify a custom icon for this mod!
 icon_atlas = "modicon.xml"
