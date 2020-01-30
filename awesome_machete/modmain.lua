@@ -14,12 +14,11 @@ local function onhackedfn_grass(inst, target, hacksleft, from_shears)
     local x, y, z= inst.Transform:GetWorldPosition()
     fx.Transform:SetPosition(x,y + math.random()*2,z)
 
-    if inst.components.hackable and inst.components.hackable.hacksleft <= 0 then		
+    if inst.components.hackable and inst.components.hackable.hacksleft <= 0 then
         if inst.SoundEmitter == nil then
             inst.entity:AddSoundEmitter() --failsafe but probably unnecessary
         end
         -- inst.SoundEmitter:PlaySound("dontstarve/wilson/pickup_reeds")
-
     else
         inst.AnimState:PlayAnimation("chop") 
         inst.AnimState:PushAnimation("idle", true)
@@ -31,6 +30,8 @@ local function onhackedfn_grass(inst, target, hacksleft, from_shears)
 
     if not from_shears then	
         -- inst.SoundEmitter:PlaySound("dontstarve_DLC003/common/harvested/grass_tall/machete")
+        inst.AnimState:PlayAnimation("picking")
+        inst.AnimState:PushAnimation("picked")
         inst.SoundEmitter:PlaySound("dontstarve/wilson/pickup_reeds")
     end
 end
@@ -40,7 +41,7 @@ local function onhackedfn_sapling(inst, target, hacksleft, from_shears)
     local x, y, z= inst.Transform:GetWorldPosition()
     fx.Transform:SetPosition(x,y + math.random()*2,z)
 
-    if inst.components.hackable and inst.components.hackable.hacksleft <= 0 then		
+    if inst.components.hackable and inst.components.hackable.hacksleft <= 0 then
         if inst.SoundEmitter == nil then
             inst.entity:AddSoundEmitter() --this will add it for saplings
         end
@@ -56,6 +57,8 @@ local function onhackedfn_sapling(inst, target, hacksleft, from_shears)
 
     if not from_shears then	
         -- inst.SoundEmitter:PlaySound("dontstarve_DLC003/common/harvested/grass_tall/machete")
+        inst.AnimState:PlayAnimation("rustle") 
+        inst.AnimState:PushAnimation("picked", false) 
         inst.SoundEmitter:PlaySound("dontstarve/wilson/harvest_sticks")	
     end
     
@@ -86,7 +89,7 @@ local function makeemptyfn_sapling(inst)
     else
         inst.AnimState:PlayAnimation("rustle") 
         inst.AnimState:PushAnimation("picked", false) 
-        end
+    end
     inst.components.hackable.hacksleft = 0
 end
 
