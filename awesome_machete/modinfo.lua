@@ -10,7 +10,7 @@ version = "1.0"
 -- http://forums.kleientertainment.com/index.php?/files/file/202-sample-mods/
 -- becomes
 -- /files/file/202-sample-mods/
-forumthread = ""
+forumthread = "files/file/1990-awesome-machete-grasssapling-hacking/"
 
 -- This lets other players know if your mod is out of date, update it to match the current version in the game
 api_version = 6
@@ -20,5 +20,5 @@ shipwrecked_compatible = true
 hamlet_compatible = true
 
 -- Can specify a custom icon for this mod!
-icon_atlas = "modicon.xml"
-icon = "modicon.tex"
+icon_atlas = "machete_grass_preview.xml"
+icon = "machete_grass_preview.tex"
