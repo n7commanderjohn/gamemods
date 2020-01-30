@@ -107,6 +107,52 @@ local function onpickedfn(inst)
 	end
 end
 
+local function onhackedfn(inst, target, hacksleft, from_shears)
+
+	local fx = SpawnPrefab("hacking_tall_grass_fx")
+	local x, y, z= inst.Transform:GetWorldPosition()
+    fx.Transform:SetPosition(x,y + math.random()*2,z)
+
+	if inst:HasTag("weevole_infested")then
+		spawnweevole(inst, target)
+	end
+
+	if inst.components.hackable and inst.components.hackable.hacksleft <= 0 then		
+		inst.AnimState:PlayAnimation("fall")			
+		inst.AnimState:PushAnimation("picked",true)			
+		inst.SoundEmitter:PlaySound("dontstarve_DLC002/common/vine_drop")	
+		if inst:HasTag("weevole_infested")then	
+			removeweevoleden(inst)
+		end
+	else
+		inst.AnimState:PlayAnimation("chop") 
+		inst.AnimState:PushAnimation("idle",true)
+	end
+
+	if inst.components.pickable then
+		inst.components.pickable:MakeEmpty()
+	end
+
+	if not from_shears then	
+		inst.SoundEmitter:PlaySound("dontstarve_DLC003/common/harvested/grass_tall/machete")
+	end
+	
+
+	--[[
+	if inst.components.pickable and inst.components.pickable:IsBarren() then
+		inst.AnimState:PushAnimation("idle_dead")
+	else
+		inst.AnimState:PushAnimation("picked")
+		if inst.inwater then 
+			inst.Physics:SetCollides(false)
+
+			inst.AnimState:SetLayer( LAYER_BACKGROUND )
+	    	inst.AnimState:SetSortOrder( 3 )
+		end 
+	end
+	]]
+end
+
 local function canshear(inst)
 	return inst.components.pickable and inst.components.pickable:CanBePicked()
 end
@@ -189,6 +235,17 @@ local function makefn(stage, artfn, product, dig_product, burnable, pick_sound)
 		inst.components.pickable.max_cycles = 20
 		inst.components.pickable.cycles_left = 20
 		inst.components.pickable.ontransplantfn = ontransplantfn
+
+		inst:AddComponent("hackable")
+		inst.components.hackable:SetUp(product, TUNING.GRASS_REGROW_TIME )  
+		inst.components.hackable.onregenfn = onregenfn
+		inst.components.hackable.onhackedfn = onhackedfn
+		inst.components.hackable.makeemptyfn = makeemptyfn
+		inst.components.hackable.makebarrenfn = makebarrenfn
+		inst.components.hackable.max_cycles = 20
+		inst.components.hackable.cycles_left = 20
+		inst.components.hackable.hacksleft = 1
+		inst.components.hackable.maxhacks = 1
 
 		inst:AddComponent("shearable")
 		inst.components.shearable:SetProduct("cutgrass", 1, true)
