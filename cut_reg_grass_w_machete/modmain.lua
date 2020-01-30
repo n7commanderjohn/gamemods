@@ -10,7 +10,7 @@ Description: Cut the pesky grass with your wonderful machete! Save lots of time!
 
 local function onhackedfn(inst, target, hacksleft, from_shears)
 
-    local fx = SpawnPrefab("hacking_tall_grass_fx")
+    local fx = GLOBAL.SpawnPrefab("hacking_tall_grass_fx")
     local x, y, z= inst.Transform:GetWorldPosition()
     fx.Transform:SetPosition(x,y + math.random()*2,z)
 
@@ -61,7 +61,8 @@ local function onregenfn(inst)
         inst.Physics:SetCollides(true)
         inst.AnimState:SetLayer( LAYER_WORLD)
         inst.AnimState:SetSortOrder(0)
-    end 
+    end
+    inst.components.hackable.hacksleft = inst.components.hackable.maxhacks
 end
 
 local function makeemptyfn(inst)
@@ -77,6 +78,7 @@ local function makeemptyfn(inst)
         inst.AnimState:SetLayer( LAYER_BACKGROUND )
         inst.AnimState:SetSortOrder( 3 )
     end 
+    inst.components.hackable.hacksleft = 0
 end
 
 local function makebarrenfn(inst)
@@ -97,6 +99,29 @@ local function makebarrenfn(inst)
     else
         inst.AnimState:PlayAnimation("idle_dead")
     end
+    inst.components.hackable.hacksleft = 0
+end
+
+local function onpickedfn(inst)
+	--inst.SoundEmitter:PlaySound("dontstarve/wilson/pickup_reeds") 
+	inst.AnimState:PlayAnimation("picking") 
+	
+	if inst.components.pickable and inst.components.pickable:IsBarren() then
+		inst.AnimState:PushAnimation("idle_dead")
+	else
+		inst.AnimState:PushAnimation("picked")
+		if inst.inwater then 
+			inst.Physics:SetCollides(false)
+
+			inst.AnimState:SetLayer( LAYER_BACKGROUND )
+	    	inst.AnimState:SetSortOrder( 3 )
+		end 
+    end
+
+    -- this should prevent hacking after grass has been picked by hand
+    if inst.components.hackable then
+		inst.components.hackable:MakeEmpty()
+	end
 end
 
 --special post-init function for a particular prefab: grass in this case
@@ -105,8 +130,11 @@ end
 function cutGrassWithMachete_PostInit(inst)
     print("i can cut grass with machetes!")
 
+    -- need to override the existing grass picking to include making hacking impossible after picking
+    inst.components.pickable.onpickedfn = onpickedfn
+
     inst:AddComponent("hackable")
-    inst.components.hackable:SetUp(product, TUNING.GRASS_REGROW_TIME )  
+    inst.components.hackable:SetUp("cutgrass", TUNING.GRASS_REGROW_TIME )
     inst.components.hackable.onregenfn = onregenfn
     inst.components.hackable.onhackedfn = onhackedfn
     inst.components.hackable.makeemptyfn = makeemptyfn
