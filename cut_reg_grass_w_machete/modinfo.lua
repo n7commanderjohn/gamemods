@@ -1,8 +1,12 @@
 -- This information tells other players more about the mod
 name = "Cut Regular Grass with the machete!"
-description = "Tired of taking forever picking your grass by hand? No worries, cut them down fast today with your trusty machete!\n" +
-"Obviously doesn't work with worlds that don't have craftable machete. Not tested with vanilla or RoG only.\n" +
-"Should work with Shipwrecked and Hamlet compatibility enabled."
+description = 
+[[
+    Tired of taking forever picking your grass by hand? No worries, cut them down fast today with your trusty machete!
+    Obviously doesn't work with worlds that don't have craftable machete. Not tested with vanilla or RoG only.
+    Should work with Shipwrecked and Hamlet compatibility enabled.
+]]
+
 author = "N7 Commander John"
 version = "1.0"
 
