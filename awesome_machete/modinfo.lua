@@ -1,6 +1,6 @@
 -- This information tells other players more about the mod
 name = "Awesome Machete! Grass/Sapling Hacking"
-description = "Tired of taking forever picking your grass and saplings by hand? No worries, cut them down fast today with your trusty machete! Obviously doesn't work with worlds that don't have craftable machete. Not tested with vanilla or RoG only. Should work with Shipwrecked and Hamlet compatibility enabled. Works with both standard and Lavish machetes."
+description = "Tired of taking forever picking your grass and saplings by hand? No worries, cut them down fast today with your trusty machete! Works with both standard and Lavish machetes. Should work with Shipwrecked and Hamlet compatibility enabled."
 
 author = "N7 Commander John"
 version = "1.0"
