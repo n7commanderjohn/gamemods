@@ -3,7 +3,7 @@ name = "Awesome Machete! Grass/Sapling Hacking"
 description = "Tired of taking forever picking your grass and saplings by hand? No worries, cut them down fast today with your trusty machete! Works with both standard and Lavish machetes. Should work with Shipwrecked and Hamlet compatibility enabled."
 
 author = "N7 Commander John"
-version = "1.0"
+version = "1.2"
 
 -- This is the URL name of the mod's thread on the forum; the part after the index.php? and before the first & in the URL
 -- Example:
