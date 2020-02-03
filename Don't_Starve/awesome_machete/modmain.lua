@@ -2,7 +2,7 @@
     
 ***************************************************************
 Created by: N7 Commander John
-Date: January 30, 2020
+Date: February 2nd, 2020
 Description: Cut the pesky grass with your wonderful machete! Save lots of time!
 ***************************************************************
 
@@ -96,7 +96,7 @@ end
 local function makebarrenfn(inst)
     if inst.components.pickable and inst.components.pickable.withered then
 
-        if not inst.components.pickable.hasbeenpicked then
+        if not inst.components.pickable.hasbeenpicked and not inst.components.hackable.hasbeenhacked then
             inst.AnimState:PlayAnimation("full_to_dead")
         else
             inst.AnimState:PlayAnimation("empty_to_dead")
@@ -135,6 +135,29 @@ local function onpickedfn_sapling(inst)
     end
 end
 
+local function ontransplantfn_grass(inst)
+	if inst.components.pickable then
+		inst.components.pickable:MakeBarren()
+	end
+	if inst.components.hackable then
+		inst.components.hackable:MakeBarren()
+	end
+	-- checks to turn into Tall Grass if on the right terrain
+	local pt = Vector3(inst.Transform:GetWorldPosition())
+	local tiletype = GetGroundTypeAtPosition(pt)
+	if tiletype == GROUND.PLAINS or tiletype == GROUND.RAINFOREST or tiletype == GROUND.DEEPRAINFOREST or tiletype == GROUND.DEEPRAINFOREST_NOCANOPY  then	
+		local newgrass = SpawnPrefab("grass_tall")
+		newgrass.Transform:SetPosition(pt:Get())
+		-- need to make it new grass here.. 
+		newgrass.components.hackable:MakeEmpty()
+		inst:Remove()
+	end
+end
+
+local function ontransplantfn_sapling(inst)
+    inst.components.pickable:MakeEmpty()
+    inst.components.hackable:MakeEmpty()
+end
 
 --special post-init function for a particular prefab: grass in this case
 --not sure yet if local functions have to be reimported to work properly;
@@ -151,10 +174,13 @@ function cutGrassWithMachete_PostInit(inst)
     inst.components.hackable.onhackedfn = onhackedfn_grass
     inst.components.hackable.makeemptyfn = makeemptyfn_grass
     inst.components.hackable.makebarrenfn = makebarrenfn
+    inst.components.hackable.ontransplantfn = ontransplantfn_grass
     inst.components.hackable.max_cycles = 20
     inst.components.hackable.cycles_left = 20
     inst.components.hackable.hacksleft = 1
     inst.components.hackable.maxhacks = 1
+
+    MakeNoGrowInWinter_Hackable(inst)
 end
 
 function cutSaplingWithMachete_PostInit(inst)
@@ -169,10 +195,40 @@ function cutSaplingWithMachete_PostInit(inst)
     inst.components.hackable.onhackedfn = onhackedfn_sapling
     inst.components.hackable.makeemptyfn = makeemptyfn_sapling
     inst.components.hackable.makebarrenfn = makebarrenfn
+    inst.components.hackable.ontransplantfn = ontransplantfn_sapling
     inst.components.hackable.max_cycles = 20
     inst.components.hackable.cycles_left = 20
     inst.components.hackable.hacksleft = 1
     inst.components.hackable.maxhacks = 1
+
+    MakeNoGrowInWinter_Hackable(inst)
+end
+
+local require = GLOBAL.require
+-- require('debugkeys')
+-- GLOBAL.CHEATS_ENABLED = true
+-- local Simutil = require "simutil"
+local GetSeasonManager = GLOBAL.GetSeasonManager
+
+local function OnGrowSeasonChange(inst)
+	if not GetSeasonManager() then return end
+	
+	if inst.components.hackable then
+		if GetSeasonManager():IsWinter() then
+			inst.components.hackable:Pause()
+		elseif not inst.components.hackable.dontunpauseafterwinter then     
+			inst.components.hackable:Resume()
+		end
+	end
+end
+
+function MakeNoGrowInWinter_Hackable(inst)
+	if not GetSeasonManager() then return end
+	
+	inst:ListenForEvent("seasonChange", function() OnGrowSeasonChange(inst) end, GLOBAL.GetWorld())
+	if GetSeasonManager():IsWinter() then
+		OnGrowSeasonChange(inst)
+	end
 end
 
 --add a post init for the grass
