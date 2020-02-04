@@ -96,7 +96,7 @@ end
 local function makebarrenfn(inst)
     if inst.components.pickable and inst.components.pickable.withered then
 
-        if not inst.components.pickable.hasbeenpicked and not inst.components.hackable.hasbeenhacked then
+        if not inst.components.pickable.hasbeenpicked or not inst.components.hackable.hasbeenhacked then
             inst.AnimState:PlayAnimation("full_to_dead")
         else
             inst.AnimState:PlayAnimation("empty_to_dead")
