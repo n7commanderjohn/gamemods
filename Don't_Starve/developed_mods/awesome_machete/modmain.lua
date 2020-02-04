@@ -76,8 +76,7 @@ local function makeemptyfn_grass(inst)
         inst.AnimState:PlayAnimation("dead_to_empty")
         inst.AnimState:PushAnimation("picked")
     else
-        inst.AnimState:PlayAnimation("picking") 
-        inst.AnimState:PushAnimation("picked")
+        inst.AnimState:PlayAnimation("picked")
     end
     inst.components.hackable.hacksleft = 0
 end
@@ -183,6 +182,25 @@ function cutGrassWithMachete_PostInit(inst)
     MakeNoGrowInWinter_Hackable(inst)
 end
 
+function cutReedsWithMachete_PostInit(inst)
+    print("i can cut reeds with machetes!")
+
+    -- need to override the existing grass picking to include making hacking impossible after picking
+    inst.components.pickable.onpickedfn = onpickedfn_grass
+
+    inst:AddComponent("hackable")
+    inst.components.hackable:SetUp("cutreeds", TUNING.REEDS_REGROW_TIME )
+    inst.components.hackable.onregenfn = onregenfn
+    inst.components.hackable.onhackedfn = onhackedfn_grass
+    inst.components.hackable.makeemptyfn = makeemptyfn_grass
+    inst.components.hackable.max_cycles = 20
+    inst.components.hackable.cycles_left = 20
+    inst.components.hackable.hacksleft = 1
+    inst.components.hackable.maxhacks = 1
+
+    MakeNoGrowInWinter_Hackable(inst)
+end
+
 function cutSaplingWithMachete_PostInit(inst)
     print("i can cut saplings with machetes!")
 
@@ -235,3 +253,5 @@ end
 AddPrefabPostInit("grass", cutGrassWithMachete_PostInit)
 --add a post init for the sapling
 AddPrefabPostInit("sapling", cutSaplingWithMachete_PostInit)
+--add a post init for the reeds
+AddPrefabPostInit("reeds", cutReedsWithMachete_PostInit)
