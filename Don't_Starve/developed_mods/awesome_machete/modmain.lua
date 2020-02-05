@@ -1,4 +1,4 @@
---[[
+    --[[
     
     ***************************************************************
     Created by: N7 Commander John
@@ -100,6 +100,32 @@
         end
     end
     
+    local function onhackedfn_spikybush(inst, target, hacksleft, from_shears)
+    
+        local fx = SpawnPrefab("hacking_tall_grass_fx")
+        local x, y, z= inst.Transform:GetWorldPosition()
+        fx.Transform:SetPosition(x,y + math.random()*2,z)
+    
+        if inst.components.hackable and inst.components.hackable.hacksleft <= 0 then
+            if inst.SoundEmitter == nil then
+                inst.entity:AddSoundEmitter() --failsafe but probably unnecessary
+            end
+        else
+            inst.AnimState:PlayAnimation("chop") 
+            inst.AnimState:PushAnimation("idle", true)
+        end
+    
+        if inst.components.pickable then
+            inst.components.pickable:MakeEmpty()
+        end
+    
+        if not from_shears then	
+            inst.AnimState:PlayAnimation("picking")
+            inst.AnimState:PushAnimation("picked")
+            inst.SoundEmitter:PlaySound("dontstarve/wilson/harvest_sticks")
+        end
+    end
+    
     local function onhackedfn_sapling(inst, target, hacksleft, from_shears)
         local fx = SpawnPrefab("hacking_tall_grass_fx")
         local x, y, z= inst.Transform:GetWorldPosition()
@@ -125,8 +151,6 @@
             inst.AnimState:PushAnimation("picked", false) 
             inst.SoundEmitter:PlaySound("dontstarve/wilson/harvest_sticks")	
         end
-        
-    
     end
     
     local function onregenfn_mod(inst)
@@ -147,6 +171,11 @@
         else
             inst.AnimState:PlayAnimation("picked")
         end
+        inst.components.hackable.hacksleft = 0
+    end
+
+    local function makeemptyfn_spikybush(inst)
+        inst.AnimState:PlayAnimation("idle_dead")
         inst.components.hackable.hacksleft = 0
     end
     
@@ -198,6 +227,27 @@
                 inst.AnimState:SetSortOrder( 3 )
             end
         end
+
+        -- this should prevent hacking after grass and saplings have been picked by hand
+        if inst.components.hackable then
+            inst.components.hackable.hacksleft = 0
+            inst.components.hackable:MakeEmpty()
+        end
+    end
+
+    local function onpickedfn_spikybush(inst, picker)
+        inst.AnimState:PlayAnimation("picking") 
+        inst.AnimState:PushAnimation("picked", false)
+        if picker.components.combat then
+            picker.components.combat:GetAttacked(inst, TUNING.MARSHBUSH_DAMAGE)
+            picker:PushEvent("thorns")
+        end
+    
+        -- this should prevent hacking after grass and saplings have been picked by hand
+        if inst.components.hackable then
+            inst.components.hackable.hacksleft = 0
+            inst.components.hackable:MakeEmpty()
+        end        
     end
     
     local function onpickedfn_sapling(inst)
@@ -276,6 +326,24 @@
     
         MakeNoGrowInWinter_Hackable(inst)
     end
+
+    function cutSpikyBushWithMachete_PostInit(inst)
+        print("i can cut spikybush with machetes!")
+    
+        -- need to override the existing grass picking to include making hacking impossible after picking
+        inst.components.pickable.onpickedfn = onpickedfn_spikybush
+    
+        inst:AddComponent("hackable")
+        inst.components.hackable:SetUp("twigs", TUNING.MARSHBUSH_REGROW_TIME )
+        inst.components.hackable.onregenfn = onregenfn_mod
+        inst.components.hackable.onhackedfn = onhackedfn_spikybush
+        inst.components.hackable.makeemptyfn = makeemptyfn_spikybush
+        inst.components.hackable.ontransplantfn = ontransplantfn_sapling
+        inst.components.hackable.max_cycles = 20
+        inst.components.hackable.cycles_left = 20
+        inst.components.hackable.hacksleft = 1
+        inst.components.hackable.maxhacks = 1
+    end
     
     function cutSaplingWithMachete_PostInit(inst)
         print("i can cut saplings with machetes!")
@@ -330,3 +398,5 @@
     AddPrefabPostInit("sapling", cutSaplingWithMachete_PostInit)
     --add a post init for the reeds
     AddPrefabPostInit("reeds", cutReedsWithMachete_PostInit)
+    --add a post init for the spiky bush
+    AddPrefabPostInit("marsh_bush", cutSpikyBushWithMachete_PostInit)
