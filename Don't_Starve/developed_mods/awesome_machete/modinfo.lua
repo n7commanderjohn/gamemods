@@ -1,6 +1,6 @@
 -- This information tells other players more about the mod
-name = "Awesome Machete! Grass/Reeds/Sapling Hacking"
-description = "Tired of taking forever picking your grass, reeds and saplings by hand? No worries, cut them down fast today with your trusty machete! Works with both standard and Lavish machetes. Should work with Shipwrecked and Hamlet compatibility enabled."
+name = "Awesome Machete! Extra Hacking"
+description = "Tired of taking forever picking your grass, reeds, spiky bushes and saplings by hand? No worries, cut them down fast today with your trusty machete! Works with all machetes. Should work with Shipwrecked and Hamlet compatibility enabled."
 
 author = "N7 Commander John"
 version = "1.4"
@@ -17,6 +17,7 @@ api_version = 6
 dont_starve_compatible = false
 reign_of_giants_compatible = false
 shipwrecked_compatible = true
+porkland_compatible = true
 hamlet_compatible = true
 
 -- Can specify a custom icon for this mod!
