@@ -10,7 +10,7 @@ version = "1.5"
 -- http://forums.kleientertainment.com/index.php?/files/file/202-sample-mods/
 -- becomes
 -- /files/file/202-sample-mods/
-forumthread = "files/file/1990-awesome-machete-grasssapling-hacking/"
+forumthread = "files/file/1990-awesome-machete-extra-hacking/"
 
 -- This lets other players know if your mod is out of date, update it to match the current version in the game
 api_version = 6
