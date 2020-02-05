@@ -8,9 +8,11 @@ Description: Cut the pesky grass with your wonderful machete! Save lots of time!
 
 ]]
 
+local SpawnPrefab = GLOBAL.SpawnPrefab
+
 local function onhackedfn_grass(inst, target, hacksleft, from_shears)
 
-    local fx = GLOBAL.SpawnPrefab("hacking_tall_grass_fx")
+    local fx = SpawnPrefab("hacking_tall_grass_fx")
     local x, y, z= inst.Transform:GetWorldPosition()
     fx.Transform:SetPosition(x,y + math.random()*2,z)
 
@@ -37,7 +39,7 @@ local function onhackedfn_grass(inst, target, hacksleft, from_shears)
 end
 
 local function onhackedfn_sapling(inst, target, hacksleft, from_shears)
-    local fx = GLOBAL.SpawnPrefab("hacking_tall_grass_fx")
+    local fx = SpawnPrefab("hacking_tall_grass_fx")
     local x, y, z= inst.Transform:GetWorldPosition()
     fx.Transform:SetPosition(x,y + math.random()*2,z)
 
@@ -65,10 +67,15 @@ local function onhackedfn_sapling(inst, target, hacksleft, from_shears)
 
 end
 
-local function onregenfn(inst)
+local function onregenfn_mod(inst)
     inst.AnimState:PlayAnimation("grow") 
-    inst.AnimState:PushAnimation("idle", true)
-    inst.components.hackable.hacksleft = inst.components.hackable.maxhacks
+    inst.AnimState:PushAnimation("sway", true)
+
+    if inst.inwater then 
+		inst.Physics:SetCollides(true)
+		inst.AnimState:SetLayer( LAYER_WORLD)
+		inst.AnimState:SetSortOrder(0)
+	end
 end
 
 local function makeemptyfn_grass(inst)
@@ -92,8 +99,14 @@ local function makeemptyfn_sapling(inst)
     inst.components.hackable.hacksleft = 0
 end
 
-local function makebarrenfn(inst)
+local function makebarrenfn_mod(inst)
     if inst.components.pickable and inst.components.pickable.withered then
+
+        if inst.inwater then 
+			inst.Physics:SetCollides(true)
+			inst.AnimState:SetLayer( LAYER_WORLD)
+			inst.AnimState:SetSortOrder(0)
+		end 
 
         if not inst.components.pickable.hasbeenpicked or not inst.components.hackable.hasbeenhacked then
             inst.AnimState:PlayAnimation("full_to_dead")
@@ -104,6 +117,7 @@ local function makebarrenfn(inst)
     else
         inst.AnimState:PlayAnimation("idle_dead")
     end
+
     inst.components.hackable.hacksleft = 0
 end
 
@@ -115,12 +129,12 @@ local function onpickedfn_grass(inst)
         inst.AnimState:PushAnimation("idle_dead")
     else
         inst.AnimState:PushAnimation("picked")
-    end
+        if inst.inwater then 
+			inst.Physics:SetCollides(false)
 
-    -- this should prevent hacking after grass and saplings have been picked by hand
-    if inst.components.hackable then
-        inst.components.hackable.hacksleft = 0
-        inst.components.hackable:MakeEmpty()
+			inst.AnimState:SetLayer( LAYER_BACKGROUND )
+	    	inst.AnimState:SetSortOrder( 3 )
+		end
     end
 end
 
@@ -169,10 +183,10 @@ function cutGrassWithMachete_PostInit(inst)
 
     inst:AddComponent("hackable")
     inst.components.hackable:SetUp("cutgrass", TUNING.GRASS_REGROW_TIME )
-    inst.components.hackable.onregenfn = onregenfn
+    inst.components.hackable.onregenfn = onregenfn_mod
     inst.components.hackable.onhackedfn = onhackedfn_grass
     inst.components.hackable.makeemptyfn = makeemptyfn_grass
-    inst.components.hackable.makebarrenfn = makebarrenfn
+    inst.components.hackable.makebarrenfn = makebarrenfn_mod
     inst.components.hackable.ontransplantfn = ontransplantfn_grass
     inst.components.hackable.max_cycles = 20
     inst.components.hackable.cycles_left = 20
@@ -190,7 +204,7 @@ function cutReedsWithMachete_PostInit(inst)
 
     inst:AddComponent("hackable")
     inst.components.hackable:SetUp("cutreeds", TUNING.REEDS_REGROW_TIME )
-    inst.components.hackable.onregenfn = onregenfn
+    inst.components.hackable.onregenfn = onregenfn_mod
     inst.components.hackable.onhackedfn = onhackedfn_grass
     inst.components.hackable.makeemptyfn = makeemptyfn_grass
     inst.components.hackable.max_cycles = 20
@@ -209,10 +223,10 @@ function cutSaplingWithMachete_PostInit(inst)
 
     inst:AddComponent("hackable")
     inst.components.hackable:SetUp("twigs", TUNING.SAPLING_REGROW_TIME )
-    inst.components.hackable.onregenfn = onregenfn
+    inst.components.hackable.onregenfn = onregenfn_mod
     inst.components.hackable.onhackedfn = onhackedfn_sapling
     inst.components.hackable.makeemptyfn = makeemptyfn_sapling
-    inst.components.hackable.makebarrenfn = makebarrenfn
+    inst.components.hackable.makebarrenfn = makebarrenfn_mod
     inst.components.hackable.ontransplantfn = ontransplantfn_sapling
     inst.components.hackable.max_cycles = 20
     inst.components.hackable.cycles_left = 20
@@ -223,8 +237,8 @@ function cutSaplingWithMachete_PostInit(inst)
 end
 
 local require = GLOBAL.require
--- require('debugkeys')
--- GLOBAL.CHEATS_ENABLED = true
+require('debugkeys')
+GLOBAL.CHEATS_ENABLED = true
 -- local Simutil = require "simutil"
 local GetSeasonManager = GLOBAL.GetSeasonManager
 
