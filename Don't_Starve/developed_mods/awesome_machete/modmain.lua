@@ -2,8 +2,8 @@
 
 ***************************************************************
 Created by: N7 Commander John
-Date: February 5th, 2020
-Description: Cut the pesky grass with your wonderful machete! Save lots of time!
+Date: February 7th, 2020
+Description: Cut the pesky plants with your wonderful machete! Save lots of time!
 ***************************************************************
 
 ]]
@@ -17,7 +17,6 @@ local Hackable = require "components/hackable"
 --override Hack to have it give the product immediately instead of dropping it.
 function Hackable:Hack(hacker, numworks, shear_mult, from_shears)
     if self.canbehacked and self.caninteractwith then
-
         self.hacksleft = self.hacksleft - numworks 
         --Check work left here and fire callback and early out if there's still more work to do 
             if self.onhackedfn then
@@ -157,17 +156,23 @@ end
 
 local function onregenfn_mod(inst)
     inst.AnimState:PlayAnimation("grow") 
-    inst.AnimState:PushAnimation("sway", true)
+    inst.AnimState:PushAnimation("idle", true)
 
     if inst.inwater then 
         inst.Physics:SetCollides(true)
-        inst.AnimState:SetLayer( LAYER_WORLD)
+        inst.AnimState:SetLayer(GLOBAL.LAYER_WORLD)
         inst.AnimState:SetSortOrder(0)
     end
 end
 
+local function onregenfn_sapling(inst)
+    inst.AnimState:PlayAnimation("grow") 
+    inst.AnimState:PushAnimation("sway", true)
+end
+
 local function makeemptyfn_grass(inst)
-    if inst.components.pickable and inst.components.pickable.withered then
+    if (inst.components.pickable and inst.components.pickable.withered)
+        or (inst.components.hackable and inst.components.hackable.withered) then
         inst.AnimState:PlayAnimation("dead_to_empty")
         inst.AnimState:PushAnimation("picked")
     else
@@ -182,7 +187,8 @@ local function makeemptyfn_spikybush(inst)
 end
 
 local function makeemptyfn_sapling(inst)
-    if inst.components.pickable and inst.components.pickable.withered then
+    if (inst.components.pickable and inst.components.pickable.withered)
+        or (inst.components.hackable and inst.components.hackable.withered) then
         inst.AnimState:PlayAnimation("dead_to_empty")
         inst.AnimState:PushAnimation("empty")
     else
@@ -193,11 +199,12 @@ local function makeemptyfn_sapling(inst)
 end
 
 local function makebarrenfn_mod(inst)
-    if inst.components.pickable and inst.components.pickable.withered then
+    if (inst.components.pickable and inst.components.pickable.withered)
+        or (inst.components.hackable and inst.components.hackable.withered) then
 
         if inst.inwater then 
             inst.Physics:SetCollides(true)
-            inst.AnimState:SetLayer( LAYER_WORLD)
+            inst.AnimState:SetLayer(GLOBAL.LAYER_WORLD)
             inst.AnimState:SetSortOrder(0)
         end 
 
@@ -215,7 +222,6 @@ local function makebarrenfn_mod(inst)
 end
 
 local function onpickedfn_grass(inst)
-    --inst.SoundEmitter:PlaySound("dontstarve/wilson/pickup_reeds") 
     inst.AnimState:PlayAnimation("picking") 
 
     if inst.components.pickable and inst.components.pickable:IsBarren() then
@@ -262,6 +268,7 @@ local function onpickedfn_sapling(inst)
     end
 end
 
+local GROUND = GLOBAL.GROUND;
 local function ontransplantfn_grass(inst)
     if inst.components.pickable then
         inst.components.pickable:MakeBarren()
@@ -272,7 +279,7 @@ local function ontransplantfn_grass(inst)
     -- checks to turn into Tall Grass if on the right terrain
     local pt = Vector3(inst.Transform:GetWorldPosition())
     local tiletype = GetGroundTypeAtPosition(pt)
-    if tiletype == GROUND.PLAINS or tiletype == GROUND.RAINFOREST or tiletype == GROUND.DEEPRAINFOREST or tiletype == GROUND.DEEPRAINFOREST_NOCANOPY  then	
+    if tiletype == GROUND.PLAINS or tiletype == GROUND.RAINFOREST or tiletype == GROUND.DEEPRAINFOREST or tiletype == GROUND.DEEPRAINFOREST_NOCANOPY then	
         local newgrass = SpawnPrefab("grass_tall")
         newgrass.Transform:SetPosition(pt:Get())
         -- need to make it new grass here.. 
@@ -355,7 +362,7 @@ function cutSaplingWithMachete_PostInit(inst)
 
     inst:AddComponent("hackable")
     inst.components.hackable:SetUp("twigs", TUNING.SAPLING_REGROW_TIME )
-    inst.components.hackable.onregenfn = onregenfn_mod
+    inst.components.hackable.onregenfn = onregenfn_sapling
     inst.components.hackable.onhackedfn = onhackedfn_sapling
     inst.components.hackable.makeemptyfn = makeemptyfn_sapling
     inst.components.hackable.makebarrenfn = makebarrenfn_mod
