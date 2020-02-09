@@ -11,8 +11,8 @@ Description: Cut the pesky plants with your wonderful machete! Save lots of time
 local require = GLOBAL.require
 local SpawnPrefab = GLOBAL.SpawnPrefab
 local Hackable = require "components/hackable"
--- require('debugkeys')
--- GLOBAL.CHEATS_ENABLED = true
+require('debugkeys')
+GLOBAL.CHEATS_ENABLED = true
 
 --override Hack to have it give the product immediately instead of dropping it.
 function Hackable:Hack(hacker, numworks, shear_mult, from_shears)
@@ -72,6 +72,50 @@ function Hackable:Hack(hacker, numworks, shear_mult, from_shears)
     end
 end
 
+local function onpickedfn_grass(inst)
+    -- this should prevent hacking after grass and saplings have been picked by hand
+    if inst.components.hackable then
+        inst.components.hackable:MakeEmpty()
+    end
+
+    inst.AnimState:PlayAnimation("picking") 
+
+    if inst.components.pickable and inst.components.pickable:IsBarren() then
+        inst.AnimState:PushAnimation("idle_dead")
+    else
+        inst.AnimState:PushAnimation("picked")
+        if inst.inwater then 
+            inst.Physics:SetCollides(false)
+
+            inst.AnimState:SetLayer(GLOBAL.LAYER_BACKGROUND )
+            inst.AnimState:SetSortOrder( 3 )
+        end
+    end
+end
+
+local function onpickedfn_spikybush(inst, picker)
+    -- this should prevent hacking after grass and saplings have been picked by hand
+    if inst.components.hackable then
+        inst.components.hackable:MakeEmpty()
+    end
+
+    inst.AnimState:PlayAnimation("picking") 
+    inst.AnimState:PushAnimation("picked", false)
+    if picker.components.combat then
+        picker.components.combat:GetAttacked(inst, TUNING.MARSHBUSH_DAMAGE)
+        picker:PushEvent("thorns")
+    end     
+end
+
+local function onpickedfn_sapling(inst)
+    if inst.components.hackable then
+        inst.components.hackable:MakeEmpty()
+    end
+
+    inst.AnimState:PlayAnimation("rustle") 
+    inst.AnimState:PushAnimation("picked", false) 
+    
+end
 
 local function onhackedfn_grass(inst, target, hacksleft, from_shears)
 
@@ -154,53 +198,8 @@ local function onhackedfn_sapling(inst, target, hacksleft, from_shears)
     end
 end
 
-local function onregenfn_mod(inst)
-    inst.AnimState:PlayAnimation("grow") 
-    inst.AnimState:PushAnimation("idle", true)
-
-    if inst.inwater then 
-        inst.Physics:SetCollides(true)
-        inst.AnimState:SetLayer(GLOBAL.LAYER_WORLD)
-        inst.AnimState:SetSortOrder(0)
-    end
-end
-
-local function onregenfn_sapling(inst)
-    inst.AnimState:PlayAnimation("grow") 
-    inst.AnimState:PushAnimation("sway", true)
-end
-
-local function makeemptyfn_grass(inst)
-    if (inst.components.pickable and inst.components.pickable.withered)
-        or (inst.components.hackable and inst.components.hackable.withered) then
-        inst.AnimState:PlayAnimation("dead_to_empty")
-        inst.AnimState:PushAnimation("picked")
-    else
-        inst.AnimState:PlayAnimation("picked")
-    end
-    inst.components.hackable.hacksleft = 0
-end
-
-local function makeemptyfn_spikybush(inst)
-    inst.AnimState:PlayAnimation("idle_dead")
-    inst.components.hackable.hacksleft = 0
-end
-
-local function makeemptyfn_sapling(inst)
-    if (inst.components.pickable and inst.components.pickable.withered)
-        or (inst.components.hackable and inst.components.hackable.withered) then
-        inst.AnimState:PlayAnimation("dead_to_empty")
-        inst.AnimState:PushAnimation("empty")
-    else
-        inst.AnimState:PlayAnimation("rustle") 
-        inst.AnimState:PushAnimation("picked", false) 
-    end
-    inst.components.hackable.hacksleft = 0
-end
-
-local function makebarrenfn_mod(inst)
-    if (inst.components.pickable and inst.components.pickable.withered)
-        or (inst.components.hackable and inst.components.hackable.withered) then
+local function makebarrenfn_hack(inst)
+    if inst.components.hackable and inst.components.hackable.withered then
 
         if inst.inwater then 
             inst.Physics:SetCollides(true)
@@ -208,7 +207,7 @@ local function makebarrenfn_mod(inst)
             inst.AnimState:SetSortOrder(0)
         end 
 
-        if not inst.components.pickable.hasbeenpicked or not inst.components.hackable.hasbeenhacked then
+        if not inst.components.hackable.hasbeenhacked then
             inst.AnimState:PlayAnimation("full_to_dead")
         else
             inst.AnimState:PlayAnimation("empty_to_dead")
@@ -217,56 +216,9 @@ local function makebarrenfn_mod(inst)
     else
         inst.AnimState:PlayAnimation("idle_dead")
     end
-
-    inst.components.hackable.hacksleft = 0
 end
 
-local function onpickedfn_grass(inst)
-    inst.AnimState:PlayAnimation("picking") 
 
-    if inst.components.pickable and inst.components.pickable:IsBarren() then
-        inst.AnimState:PushAnimation("idle_dead")
-    else
-        inst.AnimState:PushAnimation("picked")
-        if inst.inwater then 
-            inst.Physics:SetCollides(false)
-
-            inst.AnimState:SetLayer( LAYER_BACKGROUND )
-            inst.AnimState:SetSortOrder( 3 )
-        end
-    end
-
-    -- this should prevent hacking after grass and saplings have been picked by hand
-    if inst.components.hackable then
-        inst.components.hackable.hacksleft = 0
-        inst.components.hackable:MakeEmpty()
-    end
-end
-
-local function onpickedfn_spikybush(inst, picker)
-    inst.AnimState:PlayAnimation("picking") 
-    inst.AnimState:PushAnimation("picked", false)
-    if picker.components.combat then
-        picker.components.combat:GetAttacked(inst, TUNING.MARSHBUSH_DAMAGE)
-        picker:PushEvent("thorns")
-    end
-
-    -- this should prevent hacking after grass and saplings have been picked by hand
-    if inst.components.hackable then
-        inst.components.hackable.hacksleft = 0
-        inst.components.hackable:MakeEmpty()
-    end        
-end
-
-local function onpickedfn_sapling(inst)
-    inst.AnimState:PlayAnimation("rustle") 
-    inst.AnimState:PushAnimation("picked", false) 
-    
-    if inst.components.hackable then
-        inst.components.hackable.hacksleft = 0
-        inst.components.hackable:MakeEmpty()
-    end
-end
 
 local GROUND = GLOBAL.GROUND;
 local function ontransplantfn_grass(inst)
@@ -283,6 +235,7 @@ local function ontransplantfn_grass(inst)
         local newgrass = SpawnPrefab("grass_tall")
         newgrass.Transform:SetPosition(pt:Get())
         -- need to make it new grass here.. 
+        newgrass.components.pickable:MakeEmpty()
         newgrass.components.hackable:MakeEmpty()
         inst:Remove()
     end
@@ -300,19 +253,22 @@ function cutGrassWithMachete_PostInit(inst)
     print("i can cut grass with machetes!")
 
     -- need to override the existing grass picking to include making hacking impossible after picking
-    inst.components.pickable.onpickedfn = onpickedfn_grass
+    local pickableInst = inst.components.pickable
+    pickableInst.onpickedfn = onpickedfn_grass
+    pickableInst.ontransplantfn = ontransplantfn_grass
 
     inst:AddComponent("hackable")
-    inst.components.hackable:SetUp("cutgrass", TUNING.GRASS_REGROW_TIME )
-    inst.components.hackable.onregenfn = onregenfn_mod
-    inst.components.hackable.onhackedfn = onhackedfn_grass
-    inst.components.hackable.makeemptyfn = makeemptyfn_grass
-    inst.components.hackable.makebarrenfn = makebarrenfn_mod
-    inst.components.hackable.ontransplantfn = ontransplantfn_grass
-    inst.components.hackable.max_cycles = 20
-    inst.components.hackable.cycles_left = 20
-    inst.components.hackable.hacksleft = 1
-    inst.components.hackable.maxhacks = 1
+    local hackableInst = inst.components.hackable
+    hackableInst:SetUp("cutgrass", TUNING.GRASS_REGROW_TIME )
+    hackableInst.onregenfn = pickableInst.onregenfn
+    hackableInst.onhackedfn = onhackedfn_grass
+    hackableInst.makeemptyfn = pickableInst.makeemptyfn
+    hackableInst.makebarrenfn = makebarrenfn_hack
+    hackableInst.ontransplantfn = ontransplantfn_grass
+    hackableInst.max_cycles = 20
+    hackableInst.cycles_left = 20
+    hackableInst.hacksleft = 1
+    hackableInst.maxhacks = 1
 
     MakeNoGrowInWinter_Hackable(inst)
 end
@@ -321,17 +277,19 @@ function cutReedsWithMachete_PostInit(inst)
     print("i can cut reeds with machetes!")
 
     -- need to override the existing grass picking to include making hacking impossible after picking
-    inst.components.pickable.onpickedfn = onpickedfn_grass
+    local pickableInst = inst.components.pickable
+    pickableInst.onpickedfn = onpickedfn_grass
 
     inst:AddComponent("hackable")
-    inst.components.hackable:SetUp("cutreeds", TUNING.REEDS_REGROW_TIME )
-    inst.components.hackable.onregenfn = onregenfn_mod
-    inst.components.hackable.onhackedfn = onhackedfn_grass
-    inst.components.hackable.makeemptyfn = makeemptyfn_grass
-    inst.components.hackable.max_cycles = 20
-    inst.components.hackable.cycles_left = 20
-    inst.components.hackable.hacksleft = 1
-    inst.components.hackable.maxhacks = 1
+    local hackableInst = inst.components.hackable
+    hackableInst:SetUp("cutreeds", TUNING.REEDS_REGROW_TIME )
+    hackableInst.onregenfn = pickableInst.onregenfn
+    hackableInst.onhackedfn = onhackedfn_grass
+    hackableInst.makeemptyfn = pickableInst.makeemptyfn
+    hackableInst.max_cycles = 20
+    hackableInst.cycles_left = 20
+    hackableInst.hacksleft = 1
+    hackableInst.maxhacks = 1
 
     MakeNoGrowInWinter_Hackable(inst)
 end
@@ -340,37 +298,43 @@ function cutSpikyBushWithMachete_PostInit(inst)
     print("i can cut spikybush with machetes!")
 
     -- need to override the existing grass picking to include making hacking impossible after picking
-    inst.components.pickable.onpickedfn = onpickedfn_spikybush
+    local pickableInst = inst.components.pickable
+    pickableInst.onpickedfn = onpickedfn_spikybush
+    pickableInst.ontransplantfn = ontransplantfn_sapling
 
     inst:AddComponent("hackable")
-    inst.components.hackable:SetUp("twigs", TUNING.MARSHBUSH_REGROW_TIME )
-    inst.components.hackable.onregenfn = onregenfn_mod
-    inst.components.hackable.onhackedfn = onhackedfn_spikybush
-    inst.components.hackable.makeemptyfn = makeemptyfn_spikybush
-    inst.components.hackable.ontransplantfn = ontransplantfn_sapling
-    inst.components.hackable.max_cycles = 20
-    inst.components.hackable.cycles_left = 20
-    inst.components.hackable.hacksleft = 1
-    inst.components.hackable.maxhacks = 1
+    local hackableInst = inst.components.hackable
+    hackableInst:SetUp("twigs", TUNING.MARSHBUSH_REGROW_TIME )
+    hackableInst.onregenfn = pickableInst.onregenfn
+    hackableInst.onhackedfn = onhackedfn_spikybush
+    hackableInst.makeemptyfn = pickableInst.makeemptyfn
+    hackableInst.ontransplantfn = ontransplantfn_sapling
+    hackableInst.max_cycles = 20
+    hackableInst.cycles_left = 20
+    hackableInst.hacksleft = 1
+    hackableInst.maxhacks = 1
 end
 
 function cutSaplingWithMachete_PostInit(inst)
     print("i can cut saplings with machetes!")
 
     -- need to override the existing sappling picking to include making hacking impossible after picking
-    inst.components.pickable.onpickedfn = onpickedfn_sapling
+    local pickableInst = inst.components.pickable
+    pickableInst.onpickedfn = onpickedfn_sapling
+    pickableInst.ontransplantfn = ontransplantfn_sapling
 
     inst:AddComponent("hackable")
-    inst.components.hackable:SetUp("twigs", TUNING.SAPLING_REGROW_TIME )
-    inst.components.hackable.onregenfn = onregenfn_sapling
-    inst.components.hackable.onhackedfn = onhackedfn_sapling
-    inst.components.hackable.makeemptyfn = makeemptyfn_sapling
-    inst.components.hackable.makebarrenfn = makebarrenfn_mod
-    inst.components.hackable.ontransplantfn = ontransplantfn_sapling
-    inst.components.hackable.max_cycles = 20
-    inst.components.hackable.cycles_left = 20
-    inst.components.hackable.hacksleft = 1
-    inst.components.hackable.maxhacks = 1
+    local hackableInst = inst.components.hackable
+    hackableInst:SetUp("twigs", TUNING.SAPLING_REGROW_TIME )
+    hackableInst.onregenfn = pickableInst.onregenfn
+    hackableInst.onhackedfn = onhackedfn_sapling
+    hackableInst.makeemptyfn = pickableInst.makeemptyfn
+    hackableInst.makebarrenfn = makebarrenfn_hack
+    hackableInst.ontransplantfn = ontransplantfn_sapling
+    hackableInst.max_cycles = 20
+    hackableInst.cycles_left = 20
+    hackableInst.hacksleft = 1
+    hackableInst.maxhacks = 1
 
     MakeNoGrowInWinter_Hackable(inst)
 end
