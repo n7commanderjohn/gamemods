@@ -11,8 +11,8 @@ Description: Cut the pesky plants with your wonderful machete! Save lots of time
 local require = GLOBAL.require
 local SpawnPrefab = GLOBAL.SpawnPrefab
 local Hackable = require "components/hackable"
-require('debugkeys')
-GLOBAL.CHEATS_ENABLED = true
+-- require('debugkeys')
+-- GLOBAL.CHEATS_ENABLED = true
 
 --override Hack to have it give the product immediately instead of dropping it.
 function Hackable:Hack(hacker, numworks, shear_mult, from_shears)
