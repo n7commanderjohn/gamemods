@@ -33,13 +33,16 @@ local KEYS = {
 	KEY_MACHETE,
 	KEY_SCYTHE
 }
+local require = GLOBAL.require
+-- require('debugkeys')
+-- GLOBAL.CHEATS_ENABLED = true
 
 local Player = GLOBAL.GetPlayer
 local World = GLOBAL.GetWorld
-local Widget = GLOBAL.require("widgets/widget")
-local Image = GLOBAL.require("widgets/image")
-local ImageButton = GLOBAL.require("widgets/imagebutton")
-local Button = GLOBAL.require("widgets/button")
+local Widget = require("widgets/widget")
+local Image = require("widgets/image")
+local ImageButton = require("widgets/imagebutton")
+local Button = require("widgets/button")
 
 local cantButtons = 12
 
@@ -65,11 +68,15 @@ local tools_back
 local equip_back
 local boat_back
 
-local vanilla_enabled = GLOBAL.IsDLCEnabled(GLOBAL.MAIN_GAME)
-local rog_enabled = GLOBAL.IsDLCEnabled(GLOBAL.REIGN_OF_GIANTS)
-local shipwrecked_enabled = GLOBAL.IsDLCEnabled(GLOBAL.CAPY_DLC)
+local IsDLCEnabled = GLOBAL.IsDLCEnabled
+
+local vanilla_enabled = IsDLCEnabled(GLOBAL.MAIN_GAME)
+local rog_enabled = IsDLCEnabled(GLOBAL.REIGN_OF_GIANTS)
+local shipwrecked_enabled = IsDLCEnabled(GLOBAL.CAPY_DLC)
+local hamlet_enabled = IsDLCEnabled(GLOBAL.PORKLAND_DLC)
 
 local shipwrecked_world
+local hamlet_world
 
 local finish_init = false
 
@@ -754,6 +761,24 @@ local function AddKeybindButton(self,index)
 				xBoat = 68*(button_order_boat[index]-11+7)-50
 			end
 		end
+	elseif (hamlet_enabled) then
+		if (SUPPORT_SCYTHES) then
+			if (button_side_boat_scythe[index] == 0) then
+				x = 68*(button_order_boat_scythe[index]-5)-30+offset_archery
+				xBoat = 68*(button_order_boat_scythe[index]-11)-70-50
+			elseif (button_side_boat_scythe[index] == 1) then
+				x = 68*button_order_boat_scythe[index]+425-(12*(4-button_order_boat_scythe[index]))+offset_archery
+				xBoat = 68*(button_order_boat_scythe[index]-11+8)-70-50
+			end
+		else
+			if (button_side_boat[index] == 0) then
+				x = 68*(button_order_boat[index]-5)+offset_archery
+				xBoat = 68*(button_order_boat[index]-11)-50
+			elseif (button_side_boat[index] == 1) then
+				x = 68*button_order_boat[index]+425-(12*(4-button_order_boat[index]))+offset_archery
+				xBoat = 68*(button_order_boat[index]-11+7)-50
+			end
+		end
 	else
 		if (SUPPORT_SCYTHES) then
 			if (button_side_scythe[index] == 0) then
@@ -813,31 +838,60 @@ end
 
 local function InitKeybindButtons(self)
 	shipwrecked_world = (World().prefab == "shipwrecked")
+	porkland_world = (World().prefab == "porkland")
+	hamlet_world = (World().prefab == "hamlet")
 	
-	--print("SHIPWRECKED WORLD",shipwrecked_world)
+	--print("SHIPWRECKED WORLD", shipwrecked_world)
+	print("PORKLAND WORLD", porkland_world)
+	print("HAMLET WORLD", hamlet_world)
+	print("HAMLET ENABLED", hamlet_enabled)
+
+	local xml_boatback = "images/boat_back.xml"
+	local xml_basicback = "images/basic_back.xml"
+
+	local tex_toolsback = "tools_back.tex"
+	local tex_toolsbackbig = "tools_back_big.tex"
+	local tex_toolsbackship = "tools_back_ship.tex"
+	local tex_equipback = "equip_back.tex"
+	local tex_boatbackbig = "boat_back_big.tex"
+	local tex_boatback = "boat_back.tex"
 	
-	if (shipwrecked_world and SUPPORT_SCYTHES) then
-		tools_back = self:AddChild(Image("images/boat_back.xml","tools_back_big.tex"))
-		tools_back:SetPosition(-67+offset_archery,170+(67*VERTICAL_OFFSET),0)
-	elseif (shipwrecked_world or SUPPORT_SCYTHES) then
-		tools_back = self:AddChild(Image("images/basic_back.xml","tools_back_ship.tex"))
+	if (shipwrecked_world) then
+		if (SUPPORT_SCYTHES) then
+			tools_back = self:AddChild(Image(xml_boatback, tex_toolsbackbig))
+			tools_back:SetPosition(-67+offset_archery,170+(67*VERTICAL_OFFSET),0)
+		else
+			tools_back = self:AddChild(Image(xml_basicback, tex_toolsbackship))
+			tools_back:SetPosition(-67+offset_archery,170+(67*VERTICAL_OFFSET),0)
+		end
+	elseif (hamlet_enabled) then
+		if (SUPPORT_SCYTHES) then
+			tools_back = self:AddChild(Image(xml_basicback, tex_toolsbackbig))
+			tools_back:SetPosition(-67+offset_archery,170+(67*VERTICAL_OFFSET),0)
+		else
+			tools_back = self:AddChild(Image(xml_basicback, tex_toolsbackship))
+			tools_back:SetPosition(-67+offset_archery,170+(67*VERTICAL_OFFSET),0)
+		end
+	elseif (SUPPORT_SCYTHES) then
+		tools_back = self:AddChild(Image(xml_basicback, tex_toolsbackship))
 		tools_back:SetPosition(-67+offset_archery,170+(67*VERTICAL_OFFSET),0)
 	else 
-		tools_back = self:AddChild(Image("images/basic_back.xml","tools_back.tex"))
+		tools_back = self:AddChild(Image(xml_basicback, tex_toolsback))
 		tools_back:SetPosition(-34+offset_archery,170+(67*VERTICAL_OFFSET),0)
 	end
+	
 	tools_back:MoveToBack()
 	tools_back:Hide()
 	
-	equip_back = self:AddChild(Image("images/basic_back.xml","equip_back.tex"))
+	equip_back = self:AddChild(Image(xml_basicback, tex_equipback))
 	equip_back:SetPosition(460+158-42+offset_archery,170+(67*VERTICAL_OFFSET),0)
 	equip_back:MoveToBack()
 	equip_back:Hide()
 	if (SUPPORT_SCYTHES) then
-		boat_back = self:AddChild(Image("images/boat_back.xml","boat_back_big.tex"))
+		boat_back = self:AddChild(Image(xml_boatback, tex_boatbackbig))
 		boat_back:SetPosition(-378-50,170+(67*VERTICAL_OFFSET),0)
 	else
-		boat_back = self:AddChild(Image("images/boat_back.xml","boat_back.tex"))
+		boat_back = self:AddChild(Image(xml_boatback, tex_boatback))
 		boat_back:SetPosition(-378-10,170+(67*VERTICAL_OFFSET),0)
 	end
 	--boat_back:MoveToBack()
@@ -857,7 +911,7 @@ local function InitKeybindButtons(self)
 	AddKeybindButton(self,8)
 	AddKeybindButton(self,9)
 	AddKeybindButton(self,10)
-	if (shipwrecked_world) then
+	if (shipwrecked_world or hamlet_enabled) then
 		AddKeybindButton(self,11)
 	end
 	if (SUPPORT_SCYTHES) then
