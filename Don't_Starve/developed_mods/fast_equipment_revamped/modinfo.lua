@@ -1,6 +1,6 @@
 name = "Fast Equipment Revamped"
-version = "1.21"
-description = "Minor Hamlet update. Machetes will now be in equip bar for Hamlet and RoG - Hamlet compatible worlds. Adds buttons over the inventory that give a fast access to the best main tools, weapons, armors, helmets and light resources. Besides optionally adds keybinds for the mentioned tools."
+version = "1.3"
+description = "Hamlet update. Machetes will now be in equip bar for Hamlet and RoG - Hamlet compatible worlds. Most related Hamlet items added to hotkey bars. Adds buttons over the inventory that give a fast access to the best main tools, weapons, armors, helmets and light resources. Besides optionally adds keybinds for the mentioned tools."
 author = "IceGrog; N7 Commander John (Hamlet Update)"
 forumthread = "files/file/1992-fast-equipment-revamped/"
 icon = "modicon.tex"
