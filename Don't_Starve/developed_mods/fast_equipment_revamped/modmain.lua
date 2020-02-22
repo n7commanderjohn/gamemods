@@ -76,7 +76,7 @@ local shipwrecked_enabled = IsDLCEnabled(GLOBAL.CAPY_DLC)
 local hamlet_enabled = IsDLCEnabled(GLOBAL.PORKLAND_DLC)
 
 local shipwrecked_world
-local hamlet_world
+local ship_or_hamlet_enabled
 
 local finish_init = false
 
@@ -601,7 +601,7 @@ local function CheckAllButtonItem()
 		if (Player().components.inventory:GetActiveItem()) then
 			CheckButtonItem(Player().components.inventory:GetActiveItem())
 		end
-		if (shipwrecked_world and Player().components.driver.vehicle) then
+		if (ship_or_hamlet_enabled and Player().components.driver.vehicle) then
 			for i,v in pairs(Player().components.driver.vehicle.components.container:FindItems(function(inst) return true end)) do
 				CheckButtonItem(v)
 			end
@@ -636,7 +636,7 @@ local function ContainerEvents(self)
 	self.inst:ListenForEvent("onopen", function(inst, data)
 		--print("CONTAINER OPEN")
 		if (self.type == "boat" and self.opener == Player()) then
-			if (shipwrecked_world and Player().components.driver.vehicle) then
+			if (ship_or_hamlet_enabled and Player().components.driver.vehicle) then
 				--print("BOATCONTAINEROPEN ON MOUNT")
 				CheckAllButtonItem()
 			end
@@ -646,7 +646,7 @@ local function ContainerEvents(self)
 	self.inst:ListenForEvent("onclose", function(inst, data)
 		--print("CONTAINER CLOSE")
 		if (self.type == "boat" and self.opener == Player()) then
-			if (shipwrecked_world and Player().components.driver.vehicle) then
+			if (ship_or_hamlet_enabled and Player().components.driver.vehicle) then
 				--print("BOATCONTAINERCLOSE ON DISMOUNT")
 				CheckAllButtonItem()
 			end
@@ -757,25 +757,7 @@ local function AddKeybindButton(self,index)
 	
 	local x
 	local xBoat
-	if (shipwrecked_world) then
-		if (SUPPORT_SCYTHES) then
-			if (button_side_boat_scythe[index] == 0) then
-				x = 68*(button_order_boat_scythe[index]-5)-30+offset_archery
-				xBoat = 68*(button_order_boat_scythe[index]-11)-70-50
-			elseif (button_side_boat_scythe[index] == 1) then
-				x = 68*button_order_boat_scythe[index]+425-(12*(4-button_order_boat_scythe[index]))+offset_archery
-				xBoat = 68*(button_order_boat_scythe[index]-11+8)-70-50
-			end
-		else
-			if (button_side_boat[index] == 0) then
-				x = 68*(button_order_boat[index]-5)+offset_archery
-				xBoat = 68*(button_order_boat[index]-11)-50
-			elseif (button_side_boat[index] == 1) then
-				x = 68*button_order_boat[index]+425-(12*(4-button_order_boat[index]))+offset_archery
-				xBoat = 68*(button_order_boat[index]-11+7)-50
-			end
-		end
-	elseif (hamlet_enabled) then
+	if (ship_or_hamlet_enabled) then
 		if (SUPPORT_SCYTHES) then
 			if (button_side_boat_scythe[index] == 0) then
 				x = 68*(button_order_boat_scythe[index]-5)-30+offset_archery
@@ -853,12 +835,13 @@ end
 local function InitKeybindButtons(self)
 	shipwrecked_world = (World().prefab == "shipwrecked")
 	porkland_world = (World().prefab == "porkland")
-	hamlet_world = (World().prefab == "hamlet")
+
+	ship_or_hamlet_enabled = shipwrecked_world or hamlet_enabled
 	
-	--print("SHIPWRECKED WORLD", shipwrecked_world)
-	print("PORKLAND WORLD", porkland_world)
-	print("HAMLET WORLD", hamlet_world)
-	print("HAMLET ENABLED", hamlet_enabled)
+	-- print("SHIPWRECKED WORLD", shipwrecked_world)
+	-- print("SHIP or HAM enabled", ship_or_hamlet_enabled)
+	-- print("PORKLAND WORLD", porkland_world)
+	-- print("HAMLET ENABLED", hamlet_enabled)
 
 	local xml_boatback = "images/boat_back.xml"
 	local xml_basicback = "images/basic_back.xml"
@@ -870,17 +853,9 @@ local function InitKeybindButtons(self)
 	local tex_boatbackbig = "boat_back_big.tex"
 	local tex_boatback = "boat_back.tex"
 	
-	if (shipwrecked_world) then
+	if (ship_or_hamlet_enabled) then
 		if (SUPPORT_SCYTHES) then
 			tools_back = self:AddChild(Image(xml_boatback, tex_toolsbackbig))
-			tools_back:SetPosition(-67+offset_archery,170+(67*VERTICAL_OFFSET),0)
-		else
-			tools_back = self:AddChild(Image(xml_basicback, tex_toolsbackship))
-			tools_back:SetPosition(-67+offset_archery,170+(67*VERTICAL_OFFSET),0)
-		end
-	elseif (hamlet_enabled) then
-		if (SUPPORT_SCYTHES) then
-			tools_back = self:AddChild(Image(xml_basicback, tex_toolsbackbig))
 			tools_back:SetPosition(-67+offset_archery,170+(67*VERTICAL_OFFSET),0)
 		else
 			tools_back = self:AddChild(Image(xml_basicback, tex_toolsbackship))
@@ -925,7 +900,7 @@ local function InitKeybindButtons(self)
 	AddKeybindButton(self,8)
 	AddKeybindButton(self,9)
 	AddKeybindButton(self,10)
-	if (shipwrecked_world or hamlet_enabled) then
+	if (ship_or_hamlet_enabled) then
 		AddKeybindButton(self,11)
 	end
 	if (SUPPORT_SCYTHES) then
@@ -941,11 +916,11 @@ local function Init(inst)
 		
 		InventoryEvents(inst)
 		
-		if (shipwrecked_world) then
+		if (ship_or_hamlet_enabled) then
 			BoatEvents(inst)
 		end
 		
-		if (shipwrecked_world and Player().components.driver.vehicle) then
+		if ((ship_or_hamlet_enabled)and Player().components.driver.vehicle) then
 			LoadBoatInterface()
 		else
 			LoadBasicInterface()
