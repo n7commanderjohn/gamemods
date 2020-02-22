@@ -229,8 +229,8 @@ local function ontransplantfn_grass(inst)
         inst.components.hackable:MakeBarren()
     end
     -- checks to turn into Tall Grass if on the right terrain
-    local pt = Vector3(inst.Transform:GetWorldPosition())
-    local tiletype = GetGroundTypeAtPosition(pt)
+    local pt = GLOBAL.Vector3(inst.Transform:GetWorldPosition())
+    local tiletype = GLOBAL.GetGroundTypeAtPosition(pt)
     if tiletype == GROUND.PLAINS or tiletype == GROUND.RAINFOREST or tiletype == GROUND.DEEPRAINFOREST or tiletype == GROUND.DEEPRAINFOREST_NOCANOPY then	
         local newgrass = SpawnPrefab("grass_tall")
         newgrass.Transform:SetPosition(pt:Get())
