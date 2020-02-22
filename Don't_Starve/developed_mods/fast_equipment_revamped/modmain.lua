@@ -101,6 +101,8 @@ local default_icon = {
 }
 
 local weapons = {
+	"hambat",
+	"blunderbuss",
 	"zmagicbow",
 	"zmusket",
 	"zcrossbow",
@@ -108,10 +110,11 @@ local weapons = {
 	"cutlass",
 	"nightsword",
 	"ruins_bat",
-	"hambat",
 	"spear_obsidian",
 	"mace_sting",
 	"tentaclespike",
+	"cork_bat",
+	"halberd",
 	"batbat",
 	"mace_gear",
 	"spear_wathgrithr",
@@ -119,11 +122,13 @@ local weapons = {
 	"sword_rock",
 	"spear_poison",
 	"spear",
+	"boomerang",
+	"blowdart_pipe",
 	"peg_leg",
 	"trident",
 	"whip",
 	"needlespear",
-	"bug_swatter"
+	"bug_swatter",
 }
 
 local axes = {
@@ -132,7 +137,8 @@ local axes = {
 	"multitool_axe_pickaxe",
 	"obsidianaxe",
 	"goldenaxe",
-	"axe"
+	"axe",
+	"halberd"
 }
 
 local pickaxes = {
@@ -148,6 +154,7 @@ local shovels = {
 }
 
 local machetes = {
+	"shears",
 	"obsidianmachete",
 	"goldenmachete",
 	"machete"
@@ -172,6 +179,9 @@ local armors = {
 	"armor_bone",
 	"armor_stone",
 	"armorwood",
+	"antsuit",
+	"armor_weevole",
+	"armor_metalplate",
 	"armorgrass"
 }
 
@@ -184,13 +194,15 @@ local helmets = {
 	"wathgrithrhat",
 	"oxhat",
 	"hat_wood",
-	"footballhat"
+	"antmaskhat",
+	"footballhat",
+	"metalplatehat"
 }
 
 local backpacks = {
-	"backpack",
-	"piggypack",
 	"krampus_sack",
+	"piggypack",
+	"backpack",
 	"icepack",
 	"thatchpack",
 	"piratepack",
@@ -203,9 +215,11 @@ local backpacks = {
 local lights = {
 	"hat_goggles",
 	"molehat",
+	"bathat",
 	"bottlelantern",
 	"lantern",
 	"minerhat",
+	"candlehat",
 	"tarlamp",
 	"lighter",
 	"torch"
