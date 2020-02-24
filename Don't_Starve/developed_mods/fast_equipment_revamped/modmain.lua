@@ -225,6 +225,13 @@ local lights = {
 	"torch"
 }
 
+local canes = {
+	"orangestaff",
+	"walkingstick",
+	"cane",
+	"sail_stick"
+}
+
 Assets = {
 	Asset("ATLAS", "images/basic_back.xml"),
 	Asset("IMAGE", "images/basic_back.tex"),
@@ -540,8 +547,8 @@ local function CheckButtonItem(item)
 	elseif (IsInGroup(item,lights)) then
 		actual_item[7] = GetBestItem(actual_item[7],item,lights)
 		ChangeButtonIcon(7,actual_item[7])
-	elseif (item.prefab == "cane") then
-		actual_item[10] = GetBestItemNoGroup(actual_item[10],item)
+	elseif (IsInGroup(item,canes)) then
+		actual_item[10] = GetBestItem(actual_item[10],item, canes)
 		ChangeButtonIcon(10,actual_item[10])
 	elseif (IsInGroup(item,weapons)) then
 		actual_item[1] = GetBestItem(actual_item[1],item,weapons)
