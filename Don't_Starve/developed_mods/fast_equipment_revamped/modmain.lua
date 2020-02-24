@@ -679,6 +679,8 @@ local function InventoryEvents(inst)
 		--print("ITEMGET",data.item)
 		if (finish_init) then
 			if (not IsInGroup(data.item,backpacks)) then
+				-- code to check for halberd
+				-- CheckIfOtherAxesInInventory(inst)
 				CheckButtonItem(data.item)
 			end
 		end
