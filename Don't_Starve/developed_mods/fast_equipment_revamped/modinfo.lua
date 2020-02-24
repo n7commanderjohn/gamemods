@@ -1,5 +1,5 @@
 name = "Fast Equipment Revamped"
-version = "1.3"
+version = "1.3.1"
 description = "Hamlet update. Machetes will now be in equip bar for Hamlet and RoG - Hamlet compatible worlds. Most related Hamlet items added to hotkey bars. Adds buttons over the inventory that give a fast access to the best main tools, weapons, armors, helmets and light resources. Besides optionally adds keybinds for the mentioned tools."
 author = "IceGrog; N7 Commander John (Hamlet Update)"
 forumthread = "files/file/1992-fast-equipment-revamped/"
@@ -13,7 +13,6 @@ reign_of_giants_compatible = true
 shipwrecked_compatible = true
 hamlet_compatible = true
 porkland_compatible = true
-
 
 local keyslist = {}
 local string = ""
@@ -77,31 +76,31 @@ configuration_options = {
   {
     name = "Key_Light",
     label = "Light Source's Keybind",
-    default = "T",
+    default = "X",
     options = keyslist
   },
   {
     name = "Key_Cane",
-    label = "Walking Cane's Keybind",
-    default = "H",
+    label = "Cane's Keybind",
+    default = "C",
     options = keyslist
   },
   {
     name = "Key_Weapon",
     label = "Weapon's Keybind",
-    default = "G",
+    default = "F",
     options = keyslist
   },
   {
     name = "Key_Armor",
     label = "Armor's Keybind",
-    default = "C",
+    default = "V",
     options = keyslist
   },
   {
     name = "Key_Helmet",
     label = "Helmet's Keybind",
-    default = "V",
+    default = "G",
     options = keyslist
   },
   {
