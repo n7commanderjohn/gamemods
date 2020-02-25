@@ -1,11 +1,11 @@
-name = "Crafting Paws"
+name = "Crafting Paws (Hamlet Compatiblity)"
 description = "Pause while crafting or placing items.\n"..
               "(based on Relaxed Crafting by noobler and Crafting Pause by hmaarrfk)"
 
-author = "Dimblemace"
+author = "Dimblemace; N7 Commander John (Hamlet Compatibility)"
 forumthread = ""
 
-version = "0.82"
+version = "0.9"
 api_version = 6
 --priority = ?
 
@@ -15,6 +15,8 @@ icon = "modicon.tex"
 dont_starve_compatible = true
 reign_of_giants_compatible = true
 shipwrecked_compatible = true
+porkland_compatible = true
+hamlet_compatible = true
 
 --[[
 configuration_options =
@@ -63,4 +65,3 @@ configuration_options =
     }
 }
 --]]
-

@@ -64,7 +64,8 @@ local function PeriodicUpdate()
         end
     end
 
-    if ( player.HUD.controls.crafttabs.controllercrafting.open ) then
+    if ( player.HUD.controls.crafttabs.controllercraftingopen or 
+        player.HUD.controls.crafttabs.controllercrafting and player.HUD.controls.crafttabs.controllercrafting.open ) then
         if ( not paws.c_crafting ) then
 --print("pu c_crafting: T") dirty = true
             paws.c_crafting = true
