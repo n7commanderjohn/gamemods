@@ -3,9 +3,9 @@ description = "Pause while crafting or placing items.\n"..
               "(based on Relaxed Crafting by noobler and Crafting Pause by hmaarrfk)"
 
 author = "Dimblemace; N7 Commander John (Hamlet Compatibility)"
-forumthread = ""
+forumthread = "files/file/1993-crafting-paws-pause-hamlet-compatiblity/"
 
-version = "0.9"
+version = "0.91"
 api_version = 6
 --priority = ?
 
