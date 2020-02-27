@@ -42,7 +42,7 @@ function Hackable:Hack(hacker, numworks, shear_mult, from_shears)
             
             if not self.paused and not self.withered and self.baseregentime and (self.cycles_left == nil or self.cycles_left > 0) then
                 self.regentime = self.baseregentime * self:GetGrowthMod()
-                self.task = self.inst:DoTaskInTime(self.regentime, OnHackableRegen, "regen")
+                self.task = self.inst:DoTaskInTime(self.regentime, GLOBAL.OnHackableRegen, "regen")
                 self.targettime = GLOBAL.GetTime() + self.regentime
             end
             
@@ -235,6 +235,7 @@ local function ontransplantfn_grass(inst)
         local newgrass = SpawnPrefab("grass_tall")
         newgrass.Transform:SetPosition(pt:Get())
         -- need to make it new grass here.. 
+        newgrass.components.hackable:MakeEmpty()
         inst:Remove()
     end
 end
