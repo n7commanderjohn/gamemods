@@ -235,7 +235,6 @@ local function ontransplantfn_grass(inst)
         local newgrass = SpawnPrefab("grass_tall")
         newgrass.Transform:SetPosition(pt:Get())
         -- need to make it new grass here.. 
-        newgrass.components.hackable:MakeEmpty()
         inst:Remove()
     end
 end
