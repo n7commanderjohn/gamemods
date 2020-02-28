@@ -1,5 +1,5 @@
 name = "Fast Equipment Revamped / 快捷装备栏"
-version = "1.3.2"
+version = "1.4"
 description = "Hamlet update. Machetes will now be in equip bar for Hamlet and RoG - Hamlet compatible worlds. Most related Hamlet items added to hotkey bars. Adds buttons over the inventory that give a fast access to the best main tools, weapons, armors, helmets and light resources. Besides optionally adds keybinds for the mentioned tools. \ 哈姆雷特更新！兼容哈姆雷特\n1.砍刀现在在哈姆雷特和巨人国中可以在装备栏装备。2.大多数哈姆雷特相关的项目可以添加到热键栏增加快捷按钮3.能够快速访问最好的主要工具，武器，盔甲，头盔和光源。4.可以给工具添加按键绑定。"
 author = "IceGrog; N7 Commander John (Hamlet Update); 途安 (Chinese Localization)"
 forumthread = "files/file/1992-fast-equipment-revamped/"
@@ -42,6 +42,15 @@ configuration_options = {
     label = "Axe / 斧头按键",
     default = "1",
     options = keyslist
+  },
+  {
+    name = "Halberd_Category",
+    label = "Halberd under Axe",
+    default = false,
+    options = {
+      {description = "NO", data = false},
+      {description = "YES", data = true}
+    }
   },
   {
     name = "Key_Machete",
@@ -105,7 +114,7 @@ configuration_options = {
   },
   {
     name = "Letters",
-    label = "Letters on Buttons / 按钮显示",
+    label = "Label Buttons / 按钮显示",
     default = false,
     options = {
       {description = "NO", data = false},
