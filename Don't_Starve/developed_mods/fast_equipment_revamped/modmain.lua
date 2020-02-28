@@ -1,5 +1,6 @@
 local KEY_WEAPON = GetModConfigData("Key_Weapon")
 local KEY_AXE = GetModConfigData("Key_Axe")
+local HALBERD_CATEGORY_IN_AXE = GetModConfigData("Halberd_Category")
 local KEY_PICKAXE = GetModConfigData("Key_Pickaxe")
 local KEY_SHOVEL = GetModConfigData("Key_Shovel")
 local KEY_HAMMER = GetModConfigData("Key_Hammer")
@@ -114,7 +115,6 @@ local weapons = {
 	"mace_sting",
 	"tentaclespike",
 	"cork_bat",
-	"halberd",
 	"batbat",
 	"mace_gear",
 	"spear_wathgrithr",
@@ -138,8 +138,16 @@ local axes = {
 	"obsidianaxe",
 	"goldenaxe",
 	"axe",
-	"halberd"
 }
+
+-- 14 for halberd in weapons
+local halberd_name = 'halberd'
+if (HALBERD_CATEGORY_IN_AXE) then
+	local axe_table_size = table.getn(axes)
+	table.insert( axes, axe_table_size, halberd_name )
+else
+	table.insert( weapons, 14, halberd_name )
+end
 
 local pickaxes = {
 	"multitool",
@@ -213,9 +221,9 @@ local backpacks = {
 }
 
 local lights = {
-	"hat_goggles",
-	"molehat",
 	"bathat",
+	"molehat",
+	"gogglesheathat",
 	"bottlelantern",
 	"lantern",
 	"minerhat",
