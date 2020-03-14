@@ -2,7 +2,7 @@
 
 ***************************************************************
 Created by: N7 Commander John
-Date: February 7th, 2020
+Date: March 14th, 2020
 Description: Cut the pesky plants with your wonderful machete! Save lots of time!
 ***************************************************************
 
@@ -14,60 +14,64 @@ local Hackable = require "components/hackable"
 -- require('debugkeys')
 -- GLOBAL.CHEATS_ENABLED = true
 
---override Hack to have it give the product immediately instead of dropping it.
-function Hackable:Hack(hacker, numworks, shear_mult, from_shears)
-    if self.canbehacked and self.caninteractwith then
-        self.hacksleft = self.hacksleft - numworks 
-        --Check work left here and fire callback and early out if there's still more work to do 
-            if self.onhackedfn then
-            self.onhackedfn(self.inst, hacker, self.hacksleft, from_shears)
-        end
+local PLACE_INV = GetModConfigData("Place_Inv")
 
-        if(self.hacksleft <= 0) then         
-            if self.transplanted then
-                if self.cycles_left ~= nil then
-                    self.cycles_left = self.cycles_left - 1
-                end
+if PLACE_INV then
+    --override Hack to have it give the product immediately instead of dropping it.
+    function Hackable:Hack(hacker, numworks, shear_mult, from_shears)
+        if self.canbehacked and self.caninteractwith then
+            self.hacksleft = self.hacksleft - numworks 
+            --Check work left here and fire callback and early out if there's still more work to do 
+                if self.onhackedfn then
+                self.onhackedfn(self.inst, hacker, self.hacksleft, from_shears)
             end
 
-            if self.shouldwither then
-                if self.protected_cycles ~= nil then
-                    self.protected_cycles = self.protected_cycles - 1
-                end
-            end
-            
-            self.canbehacked = false
-            self.inst:AddTag("stump")
-            self.hasbeenhacked = true
-            
-            if not self.paused and not self.withered and self.baseregentime and (self.cycles_left == nil or self.cycles_left > 0) then
-                self.regentime = self.baseregentime * self:GetGrowthMod()
-                self.task = self.inst:DoTaskInTime(self.regentime, GLOBAL.OnHackableRegen, "regen")
-                self.targettime = GLOBAL.GetTime() + self.regentime
-            end
-            
-            local loot = nil
-            if self.product == "cutgrass" or self.product == "cutreeds" or self.product == "twigs" then
-                if hacker and hacker.components.inventory and self.product then        	
-                    loot = SpawnPrefab(self.product)
-                    
-                    if loot then
-                        shear_mult = shear_mult or 1
-                        if shear_mult >= 1 and loot.components.stackable then
-                            loot.components.stackable:SetStackSize(shear_mult)	            	
-                        end
-        
-                        self.inst:ApplyInheritedMoisture(loot)
-                        
-                        -- hacker:PushEvent("picksomething", {object = self.inst, loot= loot})
-                        hacker.components.inventory:GiveItem(loot, nil, GLOBAL.Vector3(TheSim:GetScreenPos(self.inst.Transform:GetWorldPosition())))
+            if(self.hacksleft <= 0) then         
+                if self.transplanted then
+                    if self.cycles_left ~= nil then
+                        self.cycles_left = self.cycles_left - 1
                     end
                 end
-            else
-                loot = self:DropProduct(shear_mult)
-            end
+
+                if self.shouldwither then
+                    if self.protected_cycles ~= nil then
+                        self.protected_cycles = self.protected_cycles - 1
+                    end
+                end
+                
+                self.canbehacked = false
+                self.inst:AddTag("stump")
+                self.hasbeenhacked = true
+                
+                if not self.paused and not self.withered and self.baseregentime and (self.cycles_left == nil or self.cycles_left > 0) then
+                    self.regentime = self.baseregentime * self:GetGrowthMod()
+                    self.task = self.inst:DoTaskInTime(self.regentime, GLOBAL.OnHackableRegen, "regen")
+                    self.targettime = GLOBAL.GetTime() + self.regentime
+                end
+                
+                local loot = nil
+                if self.product == "cutgrass" or self.product == "cutreeds" or self.product == "twigs" then
+                    if hacker and hacker.components.inventory and self.product then        	
+                        loot = SpawnPrefab(self.product)
+                        
+                        if loot then
+                            shear_mult = shear_mult or 1
+                            if shear_mult >= 1 and loot.components.stackable then
+                                loot.components.stackable:SetStackSize(shear_mult)	            	
+                            end
             
-            self.inst:PushEvent("hacked", {hacker = hacker, loot = loot, plant = self.inst})
+                            self.inst:ApplyInheritedMoisture(loot)
+                            
+                            -- hacker:PushEvent("picksomething", {object = self.inst, loot= loot})
+                            hacker.components.inventory:GiveItem(loot, nil, GLOBAL.Vector3(TheSim:GetScreenPos(self.inst.Transform:GetWorldPosition())))
+                        end
+                    end
+                else
+                    loot = self:DropProduct(shear_mult)
+                end
+                
+                self.inst:PushEvent("hacked", {hacker = hacker, loot = loot, plant = self.inst})
+            end
         end
     end
 end
