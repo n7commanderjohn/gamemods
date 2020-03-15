@@ -142,7 +142,7 @@ configuration_options = {
   {
     name = "Letters",
     label = "Label Buttons / 按钮显示",
-    default = false,
+    default = true,
     options = {
       {description = "NO", data = false},
       {description = "YES", data = true}

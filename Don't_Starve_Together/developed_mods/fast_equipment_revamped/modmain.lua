@@ -38,8 +38,9 @@ local require = GLOBAL.require
 -- require('debugkeys')
 -- GLOBAL.CHEATS_ENABLED = true
 
-local Player = GLOBAL.GetPlayer
-local World = GLOBAL.GetWorld
+-- local Player = GLOBAL.GetPlayer
+local Player
+-- local World = GLOBAL.TheWorld
 local Widget = require("widgets/widget")
 local Image = require("widgets/image")
 local ImageButton = require("widgets/imagebutton")
@@ -73,8 +74,8 @@ local IsDLCEnabled = GLOBAL.IsDLCEnabled
 
 local vanilla_enabled = IsDLCEnabled(GLOBAL.MAIN_GAME)
 local rog_enabled = IsDLCEnabled(GLOBAL.REIGN_OF_GIANTS)
-local shipwrecked_enabled = IsDLCEnabled(GLOBAL.CAPY_DLC)
-local hamlet_enabled = IsDLCEnabled(GLOBAL.PORKLAND_DLC)
+-- local shipwrecked_enabled = IsDLCEnabled(GLOBAL.CAPY_DLC)
+-- local hamlet_enabled = IsDLCEnabled(GLOBAL.PORKLAND_DLC)
 
 local shipwrecked_world
 local ship_or_hamlet_enabled
@@ -133,6 +134,7 @@ local weapons = {
 
 local axes = {
 	"lucy",
+	"gears_multitool",
 	"multitool",
 	"multitool_axe_pickaxe",
 	"obsidianaxe",
@@ -150,6 +152,7 @@ else
 end
 
 local pickaxes = {
+	"gears_multitool",
 	"multitool",
 	"multitool_axe_pickaxe",
 	"goldenpickaxe",
@@ -222,6 +225,7 @@ local backpacks = {
 
 local lights = {
 	"bathat",
+	"gears_hat_goggles",
 	"molehat",
 	"gogglesheathat",
 	"bottlelantern",
@@ -363,24 +367,24 @@ local function EquipItem(index)
 	if (actual_item[index]) then
 		local equiped_item
 		if (index == 7) then
-			equiped_item = Player().components.inventory:GetEquippedItem("hands")
-			if (not equiped_item or equiped_item.prefab ~= actual_item[index].prefab) then
-				equiped_item = Player().components.inventory:GetEquippedItem("head")
+			equiped_item = Player.replica.inventory:GetEquippedItem("hands")
+			if (equiped_item == nil or equiped_item.prefab ~= actual_item[index].prefab) then
+				equiped_item = Player.replica.inventory:GetEquippedItem("head")
 			end
 		elseif (index == 8) then
-			equiped_item = Player().components.inventory:GetEquippedItem("body")
+			equiped_item = Player.replica.inventory:GetEquippedItem("body")
 		elseif (index == 9) then
-			equiped_item = Player().components.inventory:GetEquippedItem("head")
+			equiped_item = Player.replica.inventory:GetEquippedItem("head")
 		else
-			equiped_item = Player().components.inventory:GetEquippedItem("hands")
+			equiped_item = Player.replica.inventory:GetEquippedItem("hands")
 		end
-		if (not equiped_item or actual_item[index].prefab ~= equiped_item.prefab) then
-			--Player().components.inventory:UseItemFromInvTile(actual_item[index])
-			Player().components.inventory:Equip(actual_item[index],nil)
+		if (equiped_item == nil or actual_item[index].prefab ~= equiped_item.prefab) then
+			Player.replica.inventory:UseItemFromInvTile(actual_item[index])
+			--Player.replica.inventory:Equip(actual_item[index],nil)
 		elseif (actual_item[index].prefab == equiped_item.prefab) then
-			local active_item = Player().components.inventory:GetActiveItem()
+			local active_item = Player.replica.inventory:GetActiveItem()
 			if (not(index == 8 and active_item and active_item.prefab == "torch")) then
-				Player().components.inventory:UseItemFromInvTile(equiped_item)
+				Player.replica.inventory:UseItemFromInvTile(equiped_item)
 			end
 		end
 	end
@@ -407,28 +411,28 @@ local function CompareItems(item1,item2)
 	end
 	
 	local uses1, uses2
-	if (item1.components.inventoryitem.inst.components.finiteuses) then
-		uses1 = item1.components.inventoryitem.inst.components.finiteuses:GetPercent()
+	if (item1.replica.inventoryitem.inst.replica.finiteuses) then
+		uses1 = item1.replica.inventoryitem.inst.replica.finiteuses:GetPercent()
 	end
-	if (item2.components.inventoryitem.inst.components.finiteuses) then
-		uses2 = item2.components.inventoryitem.inst.components.finiteuses:GetPercent()
-	end
-	
-	if (not uses1 and not uses2) then
-		if (item1.components.inventoryitem.inst.components.fueled) then
-			uses1 = item1.components.inventoryitem.inst.components.fueled:GetPercent()
-		end
-		if (item2.components.inventoryitem.inst.components.fueled) then
-			uses2 = item2.components.inventoryitem.inst.components.fueled:GetPercent()
-		end
+	if (item2.replica.inventoryitem.inst.replica.finiteuses) then
+		uses2 = item2.replica.inventoryitem.inst.replica.finiteuses:GetPercent()
 	end
 	
 	if (not uses1 and not uses2) then
-		if (item1.components.inventoryitem.inst.components.armor) then
-			uses1 = item1.components.inventoryitem.inst.components.armor:GetPercent()
+		if (item1.replica.inventoryitem.inst.replica.fueled) then
+			uses1 = item1.replica.inventoryitem.inst.replica.fueled:GetPercent()
 		end
-		if (item2.components.inventoryitem.inst.components.armor) then
-			uses2 = item2.components.inventoryitem.inst.components.armor:GetPercent()
+		if (item2.replica.inventoryitem.inst.replica.fueled) then
+			uses2 = item2.replica.inventoryitem.inst.replica.fueled:GetPercent()
+		end
+	end
+	
+	if (not uses1 and not uses2) then
+		if (item1.replica.inventoryitem.inst.replica.armor) then
+			uses1 = item1.replica.inventoryitem.inst.replica.armor:GetPercent()
+		end
+		if (item2.replica.inventoryitem.inst.replica.armor) then
+			uses2 = item2.replica.inventoryitem.inst.replica.armor:GetPercent()
 		end
 	end
 	
@@ -505,8 +509,8 @@ local function ChangeButtonIcon(index,item)
 		if (icon_button[index] and button[index]) then 
 			button[index]:RemoveChild(icon_button[index])
 			icon_button[index]:Kill()
-			
-			icon_button[index] = Image(item.components.inventoryitem:GetAtlas(),item.components.inventoryitem:GetImage())
+
+			icon_button[index] = Image(item.replica.inventoryitem:GetAtlas(),item.replica.inventoryitem:GetImage())
 			icon_button[index]:SetScale(0.8,0.8,0.8)
 			button[index]:AddChild(icon_button[index])
 			
@@ -607,17 +611,25 @@ end
 local function CheckAllButtonItem()
 	if (finish_init) then
 		ClearAllButtonItem()
-		for i,v in pairs(Player().components.inventory:FindItems(function(inst) return true end)) do
+		for i,v in pairs(Player.replica.inventory:GetItems()) do
 			CheckButtonItem(v)
 		end
-		for i,v in pairs(Player().components.inventory.equipslots) do
+		for i,v in pairs(Player.replica.inventory:GetEquips()) do
 			CheckButtonItem(v)
 		end
-		if (Player().components.inventory:GetActiveItem()) then
-			CheckButtonItem(Player().components.inventory:GetActiveItem())
+		if (Player.replica.inventory:GetActiveItem()) then
+			CheckButtonItem(Player.replica.inventory:GetActiveItem())
 		end
-		if (ship_or_hamlet_enabled and Player().components.driver.vehicle) then
-			for i,v in pairs(Player().components.driver.vehicle.components.container:FindItems(function(inst) return true end)) do
+		local backpack = Player.replica.inventory:GetOverflowContainer()
+		if (backpack) then
+			ContainerEvents(backpack.inst.replica.container)
+			local items = backpack.inst.replica.container:GetItems()
+			for i,v in pairs(items) do
+				CheckButtonItem(v)
+			end
+		end
+		if (ship_or_hamlet_enabled and Player.replica.driver ~= nil and Player.replica.driver.vehicle) then
+			for i,v in pairs(Player.replica.driver ~= nil and Player.replica.driver.vehicle.replica.container:FindItems(function(inst) return true end)) do
 				CheckButtonItem(v)
 			end
 		end
@@ -628,9 +640,9 @@ local function ContainerEvents(self)
 	--CONTAINER ITEM GET EVENT--
 	self.inst:ListenForEvent("itemget", function(inst, data)
 		--print("CONTAINER ITEMGET")
-		if (finish_init and self.opener == Player()) then
+		if (finish_init and self.opener == Player) then
 			--print("CONTAINER TYPE",self.type)
-			if (self.type == "pack" or (self.type == "boat" and Player().components.driver.vehicle)) then
+			if (self.type == "pack" or (self.type == "boat" and Player.replica.driver ~= nil and Player.replica.driver.vehicle)) then
 				if (not IsInGroup(data.item,backpacks)) then
 					CheckButtonItem(data.item)
 				end
@@ -640,9 +652,9 @@ local function ContainerEvents(self)
 	--CONTAINER ITEM LOSE EVENT--
 	self.inst:ListenForEvent("itemlose", function(inst, data)
 		--print("CONTAINER ITEMLOSE")
-		if (finish_init and self.opener == Player()) then
+		if (finish_init and self.opener == Player) then
 			--print("CONTAINER TYPE",self.type)
-			if (self.type == "pack" or (self.type == "boat" and Player().components.driver.vehicle)) then
+			if (self.type == "pack" or (self.type == "boat" and Player.replica.driver ~= nil and Player.replica.driver.vehicle)) then
 				CheckAllButtonItem()
 			end
 		end
@@ -650,8 +662,8 @@ local function ContainerEvents(self)
 	--CONTAINER OPEN EVENT--
 	self.inst:ListenForEvent("onopen", function(inst, data)
 		--print("CONTAINER OPEN")
-		if (self.type == "boat" and self.opener == Player()) then
-			if (ship_or_hamlet_enabled and Player().components.driver.vehicle) then
+		if (self.type == "boat" and self.opener == Player) then
+			if (ship_or_hamlet_enabled and Player.replica.driver ~= nil and Player.replica.driver.vehicle) then
 				--print("BOATCONTAINEROPEN ON MOUNT")
 				CheckAllButtonItem()
 			end
@@ -660,8 +672,8 @@ local function ContainerEvents(self)
 	--CONTAINER CLOSE EVENT--
 	self.inst:ListenForEvent("onclose", function(inst, data)
 		--print("CONTAINER CLOSE")
-		if (self.type == "boat" and self.opener == Player()) then
-			if (ship_or_hamlet_enabled and Player().components.driver.vehicle) then
+		if (self.type == "boat" and self.opener == Player) then
+			if (ship_or_hamlet_enabled and Player.replica.driver ~= nil and Player.replica.driver.vehicle) then
 				--print("BOATCONTAINERCLOSE ON DISMOUNT")
 				CheckAllButtonItem()
 			end
@@ -850,10 +862,11 @@ local function AddKeybindButton(self,index)
 end
 
 local function InitKeybindButtons(self)
-	shipwrecked_world = (World().prefab == "shipwrecked")
-	porkland_world = (World().prefab == "porkland")
+	-- shipwrecked_world = (World().prefab == "shipwrecked")
+	-- porkland_world = (World().prefab == "porkland")
 
-	ship_or_hamlet_enabled = shipwrecked_world or hamlet_enabled
+	-- ship_or_hamlet_enabled = shipwrecked_world or hamlet_enabled
+	ship_or_hamlet_enabled = false
 	
 	-- print("SHIPWRECKED WORLD", shipwrecked_world)
 	-- print("SHIP or HAM enabled", ship_or_hamlet_enabled)
@@ -930,6 +943,7 @@ AddClassPostConstruct("widgets/inventorybar", InitKeybindButtons)
 
 local function Init(inst)
 	inst:DoTaskInTime(0.1,function()
+		Player = GLOBAL.ThePlayer
 		
 		InventoryEvents(inst)
 		
@@ -937,7 +951,7 @@ local function Init(inst)
 			BoatEvents(inst)
 		end
 		
-		if ((ship_or_hamlet_enabled)and Player().components.driver.vehicle) then
+		if ((ship_or_hamlet_enabled) and Player.replica.driver ~= nil and Player.replica.driver.vehicle) then
 			LoadBoatInterface()
 		else
 			LoadBasicInterface()
@@ -989,7 +1003,7 @@ GLOBAL.TheInput:AddKeyUpHandler(
 	function()
 		if not GLOBAL.IsPaused() and IsDefaultScreen() then
 			if (not info_flag) then
-				InfoTable(Player(),Player(),nil,true)
+				InfoTable(Player,Player,nil,true)
 				info_flag = true
 			else
 				ClearInfoTable()

@@ -1,5 +1,5 @@
-name = "Fast Equipment Revamped / 快捷装备栏"
-version = "1.41"
+name = "Fast Equipment Revamped / 快捷装备栏 (Beta)"
+version = "1.5"
 description = [[Hamlet update. Machetes will now be in equip bar for Hamlet and RoG - Hamlet compatible worlds. Most related Hamlet items added to hotkey bars.
 Adds buttons over the inventory that give a fast access to the best main tools, weapons, armors, helmets and light resources.
 Besides optionally adds keybinds for the mentioned tools. 
@@ -16,12 +16,8 @@ forumthread = "files/file/1992-fast-equipment-revamped/"
 icon = "modicon.tex"
 icon_atlas = "modicon.xml"
 
-local forDST = true
-if forDST then
-    api_version = 10
-else
-    api_version = 6
-end
+api_version = 6
+dst_api_version = 10
 
 dont_starve_compatible = true
 reign_of_giants_compatible = true
@@ -142,7 +138,8 @@ configuration_options = {
   {
     name = "Letters",
     label = "Label Buttons / 按钮显示",
-    default = false,
+    hover = "If enabled, the buttons will be labeled with their keybinds.",
+    default = true,
     options = {
       {description = "NO", data = false},
       {description = "YES", data = true}
@@ -169,6 +166,7 @@ configuration_options = {
   {
     name = "Support_Archery",
     label = "Support Archery Mod / 支持弓箭模组",
+    hover = "Not fully tested yet.",
     default = false,
     options = {
       {description = "NO", data = false},
@@ -178,6 +176,7 @@ configuration_options = {
   {
     name = "Support_Scythes",
     label = "Support Scythes Mod / 支持镰刀模组",
+    hover = "Not fully tested yet.",
     default = false,
     options = {
       {description = "NO", data = false},
@@ -199,6 +198,7 @@ configuration_options = {
   {
     name = "Key_Refresh",
     label = "Refresh Key / 刷新键",
+    hover = "Refreshes the buttons? Beats me.",
     default = false,
     options = keyslist
   },

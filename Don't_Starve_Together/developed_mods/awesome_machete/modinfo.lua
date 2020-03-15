@@ -1,7 +1,7 @@
 -- This information tells other players more about the mod
-name = "Awesome Machete! Extra Hacking"
-version = "1.7"
-description = [[Tired of taking forever picking your grass, reeds, spiky bushes and saplings by hand?
+name = "Awesome Machete! Extra Hacking (Alpha)"
+version = "1.71"
+description = [[**Most likely still needs work for DST compatibility.** Tired of taking forever picking your grass, reeds, spiky bushes and saplings by hand?
 No worries, cut them down fast today with your trusty machete! Works with all machetes.
 
 Version: ]]..version
@@ -15,12 +15,8 @@ author = "N7 Commander John"
 forumthread = "files/file/1990-awesome-machete-extra-hacking/"
 
 -- This lets other players know if your mod is out of date, update it to match the current version in the game
-local forDST = true
-if forDST then
-    api_version = 10
-else
-    api_version = 6
-end
+api_version = 6
+dst_api_version = 10
 
 dont_starve_compatible = false
 reign_of_giants_compatible = false
@@ -28,10 +24,10 @@ shipwrecked_compatible = true
 hamlet_compatible = true
 
 --This lets the clients know that they need to download the mod before they can join a server that is using it.
-all_clients_require_mod = false
+all_clients_require_mod = true
 
 --This let's the game know that this mod doesn't need to be listed in the server's mod listing
-client_only_mod = true
+client_only_mod = false
 
 --Let the mod system know that this mod is functional with Don't Starve Together
 dst_compatible = true
