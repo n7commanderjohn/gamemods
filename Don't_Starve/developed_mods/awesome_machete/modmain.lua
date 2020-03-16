@@ -253,7 +253,7 @@ end
 --not sure yet if local functions have to be reimported to work properly;
 --they probably do, they are called local after all for a reason.
 function cutGrassWithMachete_PostInit(inst)
-    print("i can cut grass with machetes!")
+    -- print("i can cut grass with machetes!")
 
     -- need to override the existing grass picking to include making hacking impossible after picking
     local pickableInst = inst.components.pickable
@@ -277,7 +277,7 @@ function cutGrassWithMachete_PostInit(inst)
 end
 
 function cutReedsWithMachete_PostInit(inst)
-    print("i can cut reeds with machetes!")
+    --print("i can cut reeds with machetes!")
 
     -- need to override the existing grass picking to include making hacking impossible after picking
     local pickableInst = inst.components.pickable
@@ -298,7 +298,7 @@ function cutReedsWithMachete_PostInit(inst)
 end
 
 function cutSpikyBushWithMachete_PostInit(inst)
-    print("i can cut spikybush with machetes!")
+    --print("i can cut spikybush with machetes!")
 
     -- need to override the existing grass picking to include making hacking impossible after picking
     local pickableInst = inst.components.pickable
@@ -319,7 +319,7 @@ function cutSpikyBushWithMachete_PostInit(inst)
 end
 
 function cutSaplingWithMachete_PostInit(inst)
-    print("i can cut saplings with machetes!")
+    --print("i can cut saplings with machetes!")
 
     -- need to override the existing sappling picking to include making hacking impossible after picking
     local pickableInst = inst.components.pickable
