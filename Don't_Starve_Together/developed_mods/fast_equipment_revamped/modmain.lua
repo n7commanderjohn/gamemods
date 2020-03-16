@@ -411,29 +411,11 @@ local function CompareItems(item1,item2)
 	end
 	
 	local uses1, uses2
-	if (item1.replica.inventoryitem.inst.replica.finiteuses) then
-		uses1 = item1.replica.inventoryitem.inst.replica.finiteuses:GetPercent()
+	if (item1.replica.inventoryitem.classified.percentused) then
+		uses1 = item1.replica.inventoryitem.classified.percentused:value()
 	end
-	if (item2.replica.inventoryitem.inst.replica.finiteuses) then
-		uses2 = item2.replica.inventoryitem.inst.replica.finiteuses:GetPercent()
-	end
-	
-	if (not uses1 and not uses2) then
-		if (item1.replica.inventoryitem.inst.replica.fueled) then
-			uses1 = item1.replica.inventoryitem.inst.replica.fueled:GetPercent()
-		end
-		if (item2.replica.inventoryitem.inst.replica.fueled) then
-			uses2 = item2.replica.inventoryitem.inst.replica.fueled:GetPercent()
-		end
-	end
-	
-	if (not uses1 and not uses2) then
-		if (item1.replica.inventoryitem.inst.replica.armor) then
-			uses1 = item1.replica.inventoryitem.inst.replica.armor:GetPercent()
-		end
-		if (item2.replica.inventoryitem.inst.replica.armor) then
-			uses2 = item2.replica.inventoryitem.inst.replica.armor:GetPercent()
-		end
+	if (item2.replica.inventoryitem.classified.percentused) then
+		uses2 = item2.replica.inventoryitem.classified.percentused:value()
 	end
 	
 	if (not uses1 and uses2) then
@@ -444,7 +426,7 @@ local function CompareItems(item1,item2)
 		return nil
 	end
 		
-	--print("COMPARE USES","1:",uses1,"2:",uses2)
+	--GLOBAL.TheNet:Say("compare uses 1: "..uses1..", 2: "..uses2,true)
 	
 	if (uses1 > uses2) then
 		return item2
@@ -608,34 +590,6 @@ local function ClearAllButtonItem()
 	end
 end
 
-local function CheckAllButtonItem()
-	if (finish_init) then
-		ClearAllButtonItem()
-		for i,v in pairs(Player.replica.inventory:GetItems()) do
-			CheckButtonItem(v)
-		end
-		for i,v in pairs(Player.replica.inventory:GetEquips()) do
-			CheckButtonItem(v)
-		end
-		if (Player.replica.inventory:GetActiveItem()) then
-			CheckButtonItem(Player.replica.inventory:GetActiveItem())
-		end
-		local backpack = Player.replica.inventory:GetOverflowContainer()
-		if (backpack) then
-			ContainerEvents(backpack.inst.replica.container)
-			local items = backpack.inst.replica.container:GetItems()
-			for i,v in pairs(items) do
-				CheckButtonItem(v)
-			end
-		end
-		if (ship_or_hamlet_enabled and Player.replica.driver ~= nil and Player.replica.driver.vehicle) then
-			for i,v in pairs(Player.replica.driver ~= nil and Player.replica.driver.vehicle.replica.container:FindItems(function(inst) return true end)) do
-				CheckButtonItem(v)
-			end
-		end
-	end
-end
-
 local function ContainerEvents(self)
 	--CONTAINER ITEM GET EVENT--
 	self.inst:ListenForEvent("itemget", function(inst, data)
@@ -681,6 +635,34 @@ local function ContainerEvents(self)
 	end)
 end
 AddComponentPostInit("container", ContainerEvents)
+
+local function CheckAllButtonItem()
+	if (finish_init) then
+		ClearAllButtonItem()
+		for i,v in pairs(Player.replica.inventory:GetItems()) do
+			CheckButtonItem(v)
+		end
+		for i,v in pairs(Player.replica.inventory:GetEquips()) do
+			CheckButtonItem(v)
+		end
+		if (Player.replica.inventory:GetActiveItem()) then
+			CheckButtonItem(Player.replica.inventory:GetActiveItem())
+		end
+		local backpack = Player.replica.inventory:GetOverflowContainer()
+		if (backpack) then
+			ContainerEvents(backpack.inst.replica.container)
+			local items = backpack.inst.replica.container:GetItems()
+			for i,v in pairs(items) do
+				CheckButtonItem(v)
+			end
+		end
+		if (ship_or_hamlet_enabled and Player.replica.driver ~= nil and Player.replica.driver.vehicle) then
+			for i,v in pairs(Player.replica.driver ~= nil and Player.replica.driver.vehicle.replica.container:FindItems(function(inst) return true end)) do
+				CheckButtonItem(v)
+			end
+		end
+	end
+end
 
 local function InventoryEvents(inst)
 	--NEW ACTIVE ITEM EVENT--
