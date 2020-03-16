@@ -1,5 +1,5 @@
-Don't_Starve/samplemod/
-Don't_Starve/sampleprefab/
-Don't_Starve/Matt's_Tex_Tool_1.3.1/
+Don't_Starve/sample_mods/
+Don't_Starve_Together/sample_mods/
 */*.zip
-*/mod_demos/*.mp4
+*/mod_demos/*
+Don't_Starve_Together/Scripts/
