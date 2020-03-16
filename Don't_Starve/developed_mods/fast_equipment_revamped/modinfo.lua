@@ -1,18 +1,44 @@
 name = "Fast Equipment Revamped / 快捷装备栏"
-version = "1.4"
-description = "Hamlet update. Machetes will now be in equip bar for Hamlet and RoG - Hamlet compatible worlds. Most related Hamlet items added to hotkey bars. Adds buttons over the inventory that give a fast access to the best main tools, weapons, armors, helmets and light resources. Besides optionally adds keybinds for the mentioned tools. \ 哈姆雷特更新！兼容哈姆雷特\n1.砍刀现在在哈姆雷特和巨人国中可以在装备栏装备。2.大多数哈姆雷特相关的项目可以添加到热键栏增加快捷按钮3.能够快速访问最好的主要工具，武器，盔甲，头盔和光源。4.可以给工具添加按键绑定。"
+version = "1.41"
+description = [[Hamlet update. Machetes will now be in equip bar for Hamlet and RoG - Hamlet compatible worlds. Most related Hamlet items added to hotkey bars.
+Adds buttons over the inventory that give a fast access to the best main tools, weapons, armors, helmets and light resources.
+Besides optionally adds keybinds for the mentioned tools. 
+Version: ]]..version
+
+-- [[
+-- 哈姆雷特更新！兼容哈姆雷特
+-- 1.砍刀现在在哈姆雷特和巨人国中可以在装备栏装备。
+-- 2.大多数哈姆雷特相关的项目可以添加到热键栏增加快捷按钮3.能够快速访问最好的主要工具，武器，盔甲，头盔和光源。4.可以给工具添加按键绑定。
+
+-- Version: ]]..version
 author = "IceGrog; N7 Commander John (Hamlet Update); 途安 (Chinese Localization)"
 forumthread = "files/file/1992-fast-equipment-revamped/"
 icon = "modicon.tex"
 icon_atlas = "modicon.xml"
 
-api_version = 6
+local forDST = false
+if forDST then
+    api_version = 10
+else
+    api_version = 6
+end
 
 dont_starve_compatible = true
 reign_of_giants_compatible = true
 shipwrecked_compatible = true
 hamlet_compatible = true
-porkland_compatible = true
+
+--This lets the clients know that they need to download the mod before they can join a server that is using it.
+all_clients_require_mod = false
+
+--This let's the game know that this mod doesn't need to be listed in the server's mod listing
+client_only_mod = true
+
+--Let the mod system know that this mod is functional with Don't Starve Together
+dst_compatible = true
+
+--These tags allow the server running this mod to be found with filters from the server listing screen
+server_filter_tags = {"fast equipment", "fast", "equipment"}
 
 local keyslist = {}
 local string = ""
@@ -46,6 +72,7 @@ configuration_options = {
   {
     name = "Halberd_Category",
     label = "Halberd under Axe",
+    hover = "If enabled, the Halberd will be considered an Axe for the Axe Keybind.",
     default = false,
     options = {
       {description = "NO", data = false},
@@ -115,7 +142,7 @@ configuration_options = {
   {
     name = "Letters",
     label = "Label Buttons / 按钮显示",
-    default = false,
+    default = true,
     options = {
       {description = "NO", data = false},
       {description = "YES", data = true}
