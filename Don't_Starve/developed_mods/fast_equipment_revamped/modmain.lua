@@ -240,6 +240,17 @@ local canes = {
 	"sail_stick"
 }
 
+local hammers = {
+	"ballpein_hammer",
+	"hammer",
+}
+
+local misctools = {
+	"goldpan",
+	"bugrepellent",
+	"pitchfork"
+}
+
 Assets = {
 	Asset("ATLAS", "images/basic_back.xml"),
 	Asset("IMAGE", "images/basic_back.tex"),
@@ -546,11 +557,11 @@ local function CheckButtonItem(item)
 	elseif (IsInGroup(item,shovels)) then
 		actual_item[4] = GetBestItem(actual_item[4],item,shovels)
 		ChangeButtonIcon(4,actual_item[4])
-	elseif (item.prefab == "hammer") then
-		actual_item[5] = GetBestItemNoGroup(actual_item[5],item)
+	elseif (IsInGroup(item,hammers)) then
+		actual_item[5] = GetBestItem(actual_item[5],item, hammers)
 		ChangeButtonIcon(5,actual_item[5])
-	elseif (item.prefab == "pitchfork") then
-		actual_item[6] = GetBestItemNoGroup(actual_item[6],item)
+	elseif (IsInGroup(item,misctools)) then
+		actual_item[6] = GetBestItem(actual_item[6],item, misctools)
 		ChangeButtonIcon(6,actual_item[6])
 	elseif (IsInGroup(item,lights)) then
 		actual_item[7] = GetBestItem(actual_item[7],item,lights)
