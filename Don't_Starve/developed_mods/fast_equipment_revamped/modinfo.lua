@@ -1,10 +1,10 @@
 name = "Fast Equipment Revamped / 快捷装备栏"
-version = "1.41"
+version = "1.55"
 description = [[Hamlet update. Machetes will now be in equip bar for Hamlet and RoG - Hamlet compatible worlds. Most related Hamlet items added to hotkey bars.
 Adds buttons over the inventory that give a fast access to the best main tools, weapons, armors, helmets and light resources.
 Besides optionally adds keybinds for the mentioned tools. 
 Version: ]]..version
-
+-- + 
 -- [[
 -- 哈姆雷特更新！兼容哈姆雷特
 -- 1.砍刀现在在哈姆雷特和巨人国中可以在装备栏装备。
