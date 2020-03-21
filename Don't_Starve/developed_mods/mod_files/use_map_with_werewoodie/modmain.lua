@@ -2,6 +2,7 @@ local GetPlayer = GLOBAL.GetPlayer
 local GetWorld = GLOBAL.GetWorld
 local TheFrontEnd = GLOBAL.TheFrontEnd
 local Class = GLOBAL.Class
+local require = GLOBAL.require
 
 local Badge = require "widgets/badge"
 
