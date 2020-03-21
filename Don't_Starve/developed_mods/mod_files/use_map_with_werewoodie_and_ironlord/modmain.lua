@@ -42,7 +42,7 @@ function PlayerHud:OnControl(control, down)
     end
 
     
-    if down and control == CONTROL_OPEN_CRAFTING then
+    if down and control == GLOBAL.CONTROL_OPEN_CRAFTING then
         if self:IsControllerCraftingOpen() then
             self:CloseControllerCrafting()
         elseif not blockHUDInput then
@@ -50,7 +50,7 @@ function PlayerHud:OnControl(control, down)
         end
     end
 
-    if down and control == CONTROL_OPEN_INVENTORY then
+    if down and control == GLOBAL.CONTROL_OPEN_INVENTORY then
         if self:IsControllerInventoryOpen() then
             self:CloseControllerInventory()
         elseif not blockHUDInput then
@@ -60,8 +60,8 @@ function PlayerHud:OnControl(control, down)
     
     if not blockHUDInput then
         --inventory hotkeys
-        if down and control >= CONTROL_INV_1 and control <= CONTROL_INV_10 then
-            local num = (control - CONTROL_INV_1) + 1
+        if down and control >= GLOBAL.CONTROL_INV_1 and control <= GLOBAL.CONTROL_INV_10 then
+            local num = (control - GLOBAL.CONTROL_INV_1) + 1
             local item = self.owner.components.inventory:GetItemInSlot(num)
             self.owner.components.inventory:UseItemFromInvTile(item)
             return true
