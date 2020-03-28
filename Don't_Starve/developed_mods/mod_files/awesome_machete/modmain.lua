@@ -10,6 +10,7 @@ Description: Cut the pesky plants with your wonderful machete! Save lots of time
 
 local require = GLOBAL.require
 local SpawnPrefab = GLOBAL.SpawnPrefab
+local Pickable = require "components/pickable"
 local Hackable = require "components/hackable"
 -- require('debugkeys')
 -- GLOBAL.CHEATS_ENABLED = true
@@ -73,6 +74,30 @@ if PLACE_INV then
                 self.inst:PushEvent("hacked", {hacker = hacker, loot = loot, plant = self.inst})
             end
         end
+    end
+end
+
+function Pickable:Fertilize(fertilizer)
+    if self.inst.components.hackable then
+        -- print("Machete: hackable fertilize")
+        self.inst.components.hackable:Fertilize(fertilizer)
+    else
+        if self.inst.components.burnable then
+            self.inst.components.burnable:StopSmoldering()
+        end
+
+        if fertilizer.components.finiteuses then
+            fertilizer.components.finiteuses:Use()
+        else
+            fertilizer.components.stackable:Get(1):Remove()
+        end
+    end
+
+    self.cycles_left = self.max_cycles
+    if self.withered or self.shouldwither then
+        self:Rejuvenate(fertilizer)
+    else
+        self:MakeEmpty()
     end
 end
 
