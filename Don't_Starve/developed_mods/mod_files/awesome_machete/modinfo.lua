@@ -1,6 +1,6 @@
 -- This information tells other players more about the mod
 name = "Awesome Machete! Extra Hacking"
-version = "1.71"
+version = "1.8"
 description = [[Tired of taking forever picking your grass, reeds, spiky bushes and saplings by hand?
 No worries, cut them down fast today with your trusty machete! Works with all machetes.
 
