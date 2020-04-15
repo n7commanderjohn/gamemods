@@ -634,7 +634,7 @@ local function ContainerEvents(self)
 		end
 	end)
 end
--- AddComponentPostInit("container", ContainerEvents)
+AddComponentPostInit("container", ContainerEvents)
 
 local function CheckAllButtonItem()
 	if (finish_init) then
